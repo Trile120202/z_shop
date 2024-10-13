@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res.status(StatusCode.BAD_REQUEST).json(transformResponse( {
+            return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
                 data: null,
                 message: 'Username and password are required.',
                 statusCode: StatusCode.BAD_REQUEST,
@@ -21,7 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            const user = await db('users').where('username', username).first();
+            const user = await db('users')
+                .select('users.*', 'roles.name as role_name')
+                .leftJoin('roles', 'users.role_id', 'roles.id')
+                .where('users.username', username)
+                .first();
 
             if (!user) {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
@@ -44,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { password: _, ...userData } = user;
 
             const accessToken = jwt.sign(
-                { userId: user.id, username: user.username },
+                { userId: user.id, username: user.username, role: user.role_name },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: '1h' }
             );
@@ -55,11 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 { expiresIn: '7d' }
             );
 
-            await db('refresh_tokens').insert({
-                user_id: user.id,
-                token: refreshToken,
-                expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            });
+            // Remove the refresh token storage for now
+            // TODO: Create a 'refresh_tokens' table in the database schema
 
             res.status(StatusCode.OK).json(transformResponse({
                 data: { ...userData, accessToken, refreshToken },
