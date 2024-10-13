@@ -121,6 +121,7 @@ CREATE TABLE users
     address    TEXT,
     avatar_id  INT,
     role_id    INT          NOT NULL DEFAULT 3,
+    status INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (avatar_id) REFERENCES images (id) ON DELETE SET NULL,
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE SET NULL

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Modal from './Modal';
+import {setAccessToken, setRefreshToken} from "@/lib/tokens";
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -34,7 +35,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         try {
             if (isLogin) {
-                // Gọi API đăng nhập
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
@@ -48,9 +48,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     throw new Error(errorData.message || 'Login failed');
                 }
 
+                console.log('00000000000000000',response)
+
                 const { accessToken, refreshToken } = await response.json();
-                localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
+                setAccessToken(accessToken);
+                setRefreshToken(refreshToken);
                 onClose();
             } else {
                 if (password !== confirmPassword) {

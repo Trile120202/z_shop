@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
+import {StatusApp} from "@/lib/statusApp";
 
 const db = knex(knexConfig);
 
@@ -27,11 +28,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .where('users.username', username)
                 .first();
 
+
             if (!user) {
                 return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
                     data: null,
                     message: 'Invalid username or password.',
                     statusCode: StatusCode.UNAUTHORIZED,
+                }));
+            }
+            if (user.status==StatusApp.DELETED) {
+                return res.status(StatusCode.FORBIDDEN).json(transformResponse({
+                    data: null,
+                    message: 'User account has been deleted.',
+                    statusCode: StatusCode.FORBIDDEN,
                 }));
             }
 
@@ -49,13 +58,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const accessToken = jwt.sign(
                 { userId: user.id, username: user.username, role: user.role_name },
-                process.env.JWT_SECRET || 'your-secret-key',
+                process.env.JWT_SECRET || 'xyz',
                 { expiresIn: '1h' }
             );
 
             const refreshToken = jwt.sign(
                 { userId: user.id, username: user.username },
-                process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+                process.env.JWT_REFRESH_SECRET || 'xyz',
                 { expiresIn: '7d' }
             );
 
