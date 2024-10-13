@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    container_name: ecommerce_db
+    restart: always
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: dev_lor
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+      - ./init_schema:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
