@@ -6,7 +6,6 @@ const images = [
   '/path/to/image1.jpg',
   '/path/to/image2.jpg',
   '/path/to/image3.jpg',
-  // Thêm các đường dẫn hình ảnh khác ở đây
 ];
 
 export default function Home() {

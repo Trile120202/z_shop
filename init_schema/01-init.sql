@@ -1,4 +1,3 @@
--- Drop existing tables if they exist
 DROP TABLE IF EXISTS product_specifications CASCADE;
 DROP TABLE IF EXISTS product_tags CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
@@ -18,10 +17,9 @@ DROP TABLE IF EXISTS product_images CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS images CASCADE;
 
--- Drop the function if it exists
+
 DROP FUNCTION IF EXISTS update_modified_column() CASCADE;
 
--- Create tables
 
 CREATE TABLE images (
     id SERIAL PRIMARY KEY,
