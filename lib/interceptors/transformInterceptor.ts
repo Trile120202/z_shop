@@ -6,11 +6,17 @@ export interface ApiResponse<T> {
     data: T;
 }
 
-export function transformResponse<T>(
-    data: T,
-    statusCode: number = StatusCode.OK,
-    message: string = 'Request was successful'
-): ApiResponse<T> {
+interface TransformResponseOptions<T> {
+    data: T;
+    message?: string;
+    statusCode?: number;
+}
+
+export function transformResponse<T>({
+                                         data,
+                                         message = 'Request was successful',
+                                         statusCode = StatusCode.OK,
+                                     }: TransformResponseOptions<T>): ApiResponse<T> {
     return {
         status: statusCode,
         message,
