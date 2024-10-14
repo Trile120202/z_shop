@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Modal from './Modal';
-import {setAccessToken, setRefreshToken} from "@/lib/tokens";
+import { setAccessToken, setRefreshToken } from "@/lib/tokens";
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -43,14 +43,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     body: JSON.stringify({ username, password }),
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Login failed');
+                    throw new Error(data.message || 'Login failed');
                 }
 
-                console.log('00000000000000000',response)
-
-                const { accessToken, refreshToken } = await response.json();
+                const { accessToken, refreshToken } = data.data;
                 setAccessToken(accessToken);
                 setRefreshToken(refreshToken);
                 onClose();
@@ -68,9 +67,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     body: JSON.stringify({ username, password, email, firstName, lastName }),
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Registration failed');
+                    throw new Error(data.message || 'Registration failed');
                 }
 
                 setShowSuccessPopup(true);
