@@ -12,6 +12,7 @@
     "seed": "knex seed:run"
   },
   "dependencies": {
+    "@types/js-cookie": "^3.0.6",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "js-cookie": "^3.0.5",
