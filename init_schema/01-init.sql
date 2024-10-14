@@ -203,7 +203,6 @@ CREATE TABLE orders
     user_id          INT,
     order_date       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
     total_amount     DECIMAL(10, 2) NOT NULL,
-    status           VARCHAR(20) CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')) DEFAULT 'pending',
     shipping_address TEXT,
     payment_method   VARCHAR(50),
     created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
@@ -214,10 +213,10 @@ CREATE TABLE orders
 
 CREATE INDEX idx_orders_user_id ON orders (user_id);
 CREATE INDEX idx_orders_order_date ON orders (order_date);
-CREATE INDEX idx_orders_status ON orders (status);
 CREATE INDEX idx_orders_total_amount ON orders (total_amount);
 CREATE INDEX idx_orders_created_at ON orders (created_at);
 CREATE INDEX idx_orders_updated_at ON orders (updated_at);
+CREATE INDEX idx_orders_status ON orders (status);
 
 CREATE TABLE order_items
 (
