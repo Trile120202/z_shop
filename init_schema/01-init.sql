@@ -25,11 +25,15 @@ CREATE TABLE images
     id         SERIAL PRIMARY KEY,
     url        VARCHAR(255) NOT NULL DEFAULT 'https://picsum.photos/2000/2000?random=12',
     alt_text   VARCHAR(255),
-    created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    status     INT                   DEFAULT 1
 );
 
 CREATE INDEX idx_images_url ON images (url);
 CREATE INDEX idx_images_created_at ON images (created_at);
+CREATE INDEX idx_images_updated_at ON images (updated_at);
+CREATE INDEX idx_images_status ON images (status);
 
 CREATE TABLE products
 (
@@ -44,6 +48,7 @@ CREATE TABLE products
     thumbnail_id   INT,
     created_at     TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
+    status         INT                     DEFAULT 1,
     FOREIGN KEY (thumbnail_id) REFERENCES images (id) ON DELETE SET NULL
 );
 
@@ -54,6 +59,7 @@ CREATE INDEX idx_products_price ON products (price);
 CREATE INDEX idx_products_stock_quantity ON products (stock_quantity);
 CREATE INDEX idx_products_created_at ON products (created_at);
 CREATE INDEX idx_products_updated_at ON products (updated_at);
+CREATE INDEX idx_products_status ON products (status);
 
 CREATE TABLE product_images
 (
@@ -62,6 +68,8 @@ CREATE TABLE product_images
     image_id      INT,
     display_order INT,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status        INT       DEFAULT 1,
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     FOREIGN KEY (image_id) REFERENCES images (id) ON DELETE CASCADE
 );
@@ -69,6 +77,9 @@ CREATE TABLE product_images
 CREATE INDEX idx_product_images_product_id ON product_images (product_id);
 CREATE INDEX idx_product_images_image_id ON product_images (image_id);
 CREATE INDEX idx_product_images_display_order ON product_images (display_order);
+CREATE INDEX idx_product_images_created_at ON product_images (created_at);
+CREATE INDEX idx_product_images_updated_at ON product_images (updated_at);
+CREATE INDEX idx_product_images_status ON product_images (status);
 
 CREATE TABLE categories
 (
@@ -78,6 +89,8 @@ CREATE TABLE categories
     parent_id  INT,
     image_id   INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT       DEFAULT 1,
     FOREIGN KEY (parent_id) REFERENCES categories (id) ON DELETE SET NULL,
     FOREIGN KEY (image_id) REFERENCES images (id) ON DELETE SET NULL
 );
@@ -85,11 +98,16 @@ CREATE TABLE categories
 CREATE INDEX idx_categories_name ON categories (name);
 CREATE INDEX idx_categories_parent_id ON categories (parent_id);
 CREATE INDEX idx_categories_created_at ON categories (created_at);
+CREATE INDEX idx_categories_updated_at ON categories (updated_at);
+CREATE INDEX idx_categories_status ON categories (status);
 
 CREATE TABLE product_categories
 (
     product_id  INT,
     category_id INT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status      INT DEFAULT 1,
     PRIMARY KEY (product_id, category_id),
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
@@ -97,17 +115,23 @@ CREATE TABLE product_categories
 
 CREATE INDEX idx_product_categories_product_id ON product_categories (product_id);
 CREATE INDEX idx_product_categories_category_id ON product_categories (category_id);
+CREATE INDEX idx_product_categories_created_at ON product_categories (created_at);
+CREATE INDEX idx_product_categories_updated_at ON product_categories (updated_at);
+CREATE INDEX idx_product_categories_status ON product_categories (status);
 
 CREATE TABLE roles
 (
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status      INT DEFAULT 1
 );
-INSERT INTO roles (name, description)
-VALUES ('admin', 'Administrator with full access'),
-       ('manager', 'Manager with elevated privileges'),
-       ('user', 'Regular user with standard access');
+INSERT INTO roles (name, description, created_at)
+VALUES ('admin', 'Administrator with full access', CURRENT_TIMESTAMP),
+       ('manager', 'Manager with elevated privileges', CURRENT_TIMESTAMP),
+       ('user', 'Regular user with standard access', CURRENT_TIMESTAMP);
 
 CREATE TABLE users
 (
@@ -121,8 +145,9 @@ CREATE TABLE users
     address    TEXT,
     avatar_id  INT,
     role_id    INT          NOT NULL DEFAULT 3,
-    status INT DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT                   DEFAULT 1,
+    created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (avatar_id) REFERENCES images (id) ON DELETE SET NULL,
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE SET NULL
 );
@@ -130,23 +155,37 @@ CREATE TABLE users
 CREATE INDEX idx_users_username ON users (username);
 CREATE INDEX idx_users_email ON users (email);
 CREATE INDEX idx_users_created_at ON users (created_at);
+CREATE INDEX idx_users_updated_at ON users (updated_at);
 CREATE INDEX idx_users_role_id ON users (role_id);
+CREATE INDEX idx_users_status ON users (status);
 
 CREATE INDEX idx_roles_name ON roles (name);
+CREATE INDEX idx_roles_created_at ON roles (created_at);
+CREATE INDEX idx_roles_updated_at ON roles (updated_at);
+CREATE INDEX idx_roles_status ON roles (status);
 
 CREATE TABLE permissions
 (
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status      INT DEFAULT 1
 );
 
 CREATE INDEX idx_permissions_name ON permissions (name);
+CREATE INDEX idx_permissions_created_at ON permissions (created_at);
+CREATE INDEX idx_permissions_updated_at ON permissions (updated_at);
+CREATE INDEX idx_permissions_status ON permissions (status);
 
 CREATE TABLE role_permissions
 (
     role_id       INT,
     permission_id INT,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status        INT DEFAULT 1,
     PRIMARY KEY (role_id, permission_id),
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
     FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
@@ -154,6 +193,9 @@ CREATE TABLE role_permissions
 
 CREATE INDEX idx_role_permissions_role_id ON role_permissions (role_id);
 CREATE INDEX idx_role_permissions_permission_id ON role_permissions (permission_id);
+CREATE INDEX idx_role_permissions_created_at ON role_permissions (created_at);
+CREATE INDEX idx_role_permissions_updated_at ON role_permissions (updated_at);
+CREATE INDEX idx_role_permissions_status ON role_permissions (status);
 
 CREATE TABLE orders
 (
@@ -164,6 +206,9 @@ CREATE TABLE orders
     status           VARCHAR(20) CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')) DEFAULT 'pending',
     shipping_address TEXT,
     payment_method   VARCHAR(50),
+    created_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP                                                                                    DEFAULT CURRENT_TIMESTAMP,
+    status           INT                                                                                          DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
@@ -171,6 +216,8 @@ CREATE INDEX idx_orders_user_id ON orders (user_id);
 CREATE INDEX idx_orders_order_date ON orders (order_date);
 CREATE INDEX idx_orders_status ON orders (status);
 CREATE INDEX idx_orders_total_amount ON orders (total_amount);
+CREATE INDEX idx_orders_created_at ON orders (created_at);
+CREATE INDEX idx_orders_updated_at ON orders (updated_at);
 
 CREATE TABLE order_items
 (
@@ -179,12 +226,18 @@ CREATE TABLE order_items
     product_id INT,
     quantity   INT            NOT NULL,
     price      DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+    status     INT            DEFAULT 1,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_order_items_order_id ON order_items (order_id);
 CREATE INDEX idx_order_items_product_id ON order_items (product_id);
+CREATE INDEX idx_order_items_created_at ON order_items (created_at);
+CREATE INDEX idx_order_items_updated_at ON order_items (updated_at);
+CREATE INDEX idx_order_items_status ON order_items (status);
 
 CREATE TABLE reviews
 (
@@ -194,6 +247,8 @@ CREATE TABLE reviews
     rating     INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment    TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT       DEFAULT 1,
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 );
@@ -202,6 +257,8 @@ CREATE INDEX idx_reviews_product_id ON reviews (product_id);
 CREATE INDEX idx_reviews_user_id ON reviews (user_id);
 CREATE INDEX idx_reviews_rating ON reviews (rating);
 CREATE INDEX idx_reviews_created_at ON reviews (created_at);
+CREATE INDEX idx_reviews_updated_at ON reviews (updated_at);
+CREATE INDEX idx_reviews_status ON reviews (status);
 
 CREATE TABLE coupons
 (
@@ -213,7 +270,10 @@ CREATE TABLE coupons
     end_date            DATE,
     min_purchase_amount DECIMAL(10, 2),
     max_usage           INT,
-    is_active           BOOLEAN DEFAULT TRUE
+    is_active           BOOLEAN DEFAULT TRUE,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status              INT     DEFAULT 1
 );
 
 CREATE INDEX idx_coupons_code ON coupons (code);
@@ -221,6 +281,9 @@ CREATE INDEX idx_coupons_discount_type ON coupons (discount_type);
 CREATE INDEX idx_coupons_start_date ON coupons (start_date);
 CREATE INDEX idx_coupons_end_date ON coupons (end_date);
 CREATE INDEX idx_coupons_is_active ON coupons (is_active);
+CREATE INDEX idx_coupons_created_at ON coupons (created_at);
+CREATE INDEX idx_coupons_updated_at ON coupons (updated_at);
+CREATE INDEX idx_coupons_status ON coupons (status);
 
 CREATE TABLE wishlist
 (
@@ -228,6 +291,8 @@ CREATE TABLE wishlist
     user_id    INT,
     product_id INT,
     added_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT       DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     UNIQUE (user_id, product_id)
@@ -236,21 +301,30 @@ CREATE TABLE wishlist
 CREATE INDEX idx_wishlist_user_id ON wishlist (user_id);
 CREATE INDEX idx_wishlist_product_id ON wishlist (product_id);
 CREATE INDEX idx_wishlist_added_at ON wishlist (added_at);
+CREATE INDEX idx_wishlist_updated_at ON wishlist (updated_at);
+CREATE INDEX idx_wishlist_status ON wishlist (status);
 
 CREATE TABLE tags
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT       DEFAULT 1
 );
 
 CREATE INDEX idx_tags_name ON tags (name);
 CREATE INDEX idx_tags_created_at ON tags (created_at);
+CREATE INDEX idx_tags_updated_at ON tags (updated_at);
+CREATE INDEX idx_tags_status ON tags (status);
 
 CREATE TABLE product_tags
 (
     product_id INT,
     tag_id     INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
     PRIMARY KEY (product_id, tag_id),
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
@@ -258,6 +332,9 @@ CREATE TABLE product_tags
 
 CREATE INDEX idx_product_tags_product_id ON product_tags (product_id);
 CREATE INDEX idx_product_tags_tag_id ON product_tags (tag_id);
+CREATE INDEX idx_product_tags_created_at ON product_tags (created_at);
+CREATE INDEX idx_product_tags_updated_at ON product_tags (updated_at);
+CREATE INDEX idx_product_tags_status ON product_tags (status);
 
 CREATE TABLE product_specifications
 (
@@ -266,12 +343,18 @@ CREATE TABLE product_specifications
     spec_name  VARCHAR(100) NOT NULL,
     spec_value TEXT         NOT NULL,
     unit       VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status     INT DEFAULT 1,
     FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     UNIQUE (product_id, spec_name)
 );
 
 CREATE INDEX idx_product_specifications_product_id ON product_specifications (product_id);
 CREATE INDEX idx_product_specifications_spec_name ON product_specifications (spec_name);
+CREATE INDEX idx_product_specifications_created_at ON product_specifications (created_at);
+CREATE INDEX idx_product_specifications_updated_at ON product_specifications (updated_at);
+CREATE INDEX idx_product_specifications_status ON product_specifications (status);
 
 CREATE OR REPLACE FUNCTION update_modified_column()
     RETURNS TRIGGER AS
@@ -285,5 +368,11 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_product_modtime
     BEFORE UPDATE
     ON products
+    FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE TRIGGER update_images_modtime
+    BEFORE UPDATE
+    ON images
     FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
