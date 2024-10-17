@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Your App Name",
-  description: "Your app description",
+  title: "Z-Shop",
+  description: "Welcome to Z-Shop",
 };
 
 export default function RootLayout({

@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <header className="bg-blue-700 text-white p-4">
       <div className="container mx-auto flex flex-wrap justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Your Website</h1>
+        <h1 className="text-2xl font-bold text-white">Z-Shop</h1>
         <button 
           className="lg:hidden text-white focus:outline-none"
           onClick={toggleMenu}
