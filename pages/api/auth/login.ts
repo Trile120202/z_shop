@@ -6,6 +6,7 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import {StatusApp} from "@/lib/statusApp";
+import { serialize } from 'cookie';
 
 const db = knex(knexConfig);
 
@@ -70,6 +71,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             // Remove the refresh token storage for now
             // TODO: Create a 'refresh_tokens' table in the database schema
+
+            res.setHeader('Set-Cookie', serialize('token', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600,
+                sameSite: 'strict',
+                path: '/',
+            }));
 
             res.status(StatusCode.OK).json(transformResponse({
                 data: { ...userData, accessToken, refreshToken },
