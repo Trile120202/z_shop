@@ -46,7 +46,7 @@ const Page: React.FC = () => {
         <div className="container mx-auto px-4 py-8 text-gray-800">
             <motion.h1 
                 ref={titleRef}
-                className="text-5xl font-bold mb-10 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text"
+                className="text-5xl h-[60px] font-bold mb-10 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text"
                 initial={{ opacity: 0, y: -50 }}
                 animate={titleControls}
                 transition={{ duration: 0.5 }}
