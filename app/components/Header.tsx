@@ -26,8 +26,8 @@ export default function Header() {
         <nav className={`${isMenuOpen ? 'block' : 'hidden'} w-full lg:flex lg:items-center lg:w-auto mt-4 lg:mt-0`}>
           <ul className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 items-center">
             <li><Link href="/" className="text-white hover:text-yellow-300 transition duration-300 block">Trang chủ</Link></li>
-            <li><Link href="/about" className="text-white hover:text-yellow-300 transition duration-300 block">Giới thiệu</Link></li>
-            <li><Link href="/contact" className="text-white hover:text-yellow-300 transition duration-300 block">Liên hệ</Link></li>
+            <li><Link href="/gioi-thieu" className="text-white hover:text-yellow-300 transition duration-300 block">Giới thiệu</Link></li>
+            <li><Link href="/lien-he" className="text-white hover:text-yellow-300 transition duration-300 block">Liên hệ</Link></li>
             <li>
               <button
                 onClick={openAuthModal}
