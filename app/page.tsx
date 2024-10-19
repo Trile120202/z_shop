@@ -1,6 +1,7 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Carousel from './components/Carousel';
+import CategoryHome from './components/home/CategoryHome';
 
 
 export default function Home() {
@@ -43,6 +44,7 @@ export default function Home() {
                         </div>
                     ))}
                 </div>
+                <CategoryHome />
 
 
             </main>
