@@ -5,6 +5,7 @@ import knexConfig from '../../../knexfile';
 import { StatusCode } from "@/lib/statusCodes";
 import { transformResponse } from "@/lib/interceptors/transformInterceptor";
 import { StatusApp } from "@/lib/statusApp";
+import {parse} from "cookie";
 
 const db = knex(knexConfig);
 
@@ -68,3 +69,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }
+
+
+//
+// const cookies = parse(req.headers.cookie || '');
+// const tokena  = cookies.token;
+//
+// if (!token) {
+//     return res.status(StatusCode.UNAUTHORIZED).json(transformResponse({
+//         data: null,
+//         message: 'No token provided.',
+//         statusCode: StatusCode.UNAUTHORIZED,
+//     }));
+// }
