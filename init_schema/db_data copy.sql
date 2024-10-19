@@ -62,6 +62,7 @@ CREATE TABLE products
 (
     id             SERIAL PRIMARY KEY,
     name           VARCHAR(255)   NOT NULL,
+    slug           VARCHAR(255)   NOT NULL UNIQUE,
     brand          VARCHAR(100)   NOT NULL,
     model          VARCHAR(100)   NOT NULL,
     price          DECIMAL(10, 2) NOT NULL,
@@ -81,6 +82,7 @@ RETURNS VOID AS $$
 DECLARE
     i INTEGER;
     random_name VARCHAR(255);
+    random_slug VARCHAR(255);
     random_brand VARCHAR(100);
     random_model VARCHAR(100);
     random_price DECIMAL(10, 2);
@@ -95,6 +97,7 @@ BEGIN
 
     FOR i IN 1..num_records LOOP
         random_name := 'Product ' || i;
+        random_slug := LOWER(REPLACE(random_name, ' ', '-'));
         random_brand := 'Brand ' || (random() * 10 + 1)::INT;
         random_model := 'Model ' || (random() * 100 + 1)::INT;
         random_price := (random() * 1000 + 10)::DECIMAL(10, 2);
@@ -106,8 +109,8 @@ BEGIN
         random_stock := (random() * 100 + 1)::INT;
         random_thumbnail := (random() * max_image_id + 1)::INT;
 
-        INSERT INTO products (name, brand, model, price, description, specifications, stock_quantity, thumbnail_id)
-        VALUES (random_name, random_brand, random_model, random_price, random_description, random_specs, random_stock, random_thumbnail);
+        INSERT INTO products (name, slug, brand, model, price, description, specifications, stock_quantity, thumbnail_id)
+        VALUES (random_name, random_slug, random_brand, random_model, random_price, random_description, random_specs, random_stock, random_thumbnail);
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
@@ -116,6 +119,7 @@ $$ LANGUAGE plpgsql;
 SELECT generate_product_data(100);
 
 CREATE INDEX idx_products_name ON products (name);
+CREATE INDEX idx_products_slug ON products (slug);
 CREATE INDEX idx_products_brand ON products (brand);
 CREATE INDEX idx_products_model ON products (model);
 CREATE INDEX idx_products_price ON products (price);
@@ -175,6 +179,7 @@ CREATE TABLE categories
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
+    slug       VARCHAR(100) NOT NULL UNIQUE,
     content    TEXT,
     parent_id  INT,
     image_id   INT,
@@ -190,13 +195,20 @@ CREATE OR REPLACE FUNCTION generate_random_categories(n INTEGER) RETURNS VOID AS
 DECLARE
     i INTEGER;
     random_name VARCHAR(100);
+    random_slug VARCHAR(100);
     random_content TEXT;
     random_parent_id INT;
     random_image_id INT;
+    laptop_categories VARCHAR[] := ARRAY['Gaming Laptops', 'Business Laptops', 'Ultrabooks', '2-in-1 Laptops', 'Budget Laptops', 'High-Performance Laptops', 'Student Laptops', 'Workstation Laptops', 'Chromebooks', 'MacBooks'];
 BEGIN
     FOR i IN 1..n LOOP
-        random_name := 'Category ' || i;
-        random_content := 'Content for category ' || i;
+        IF i <= array_length(laptop_categories, 1) THEN
+            random_name := laptop_categories[i];
+        ELSE
+            random_name := 'Laptop Category ' || i;
+        END IF;
+        random_slug := lower(regexp_replace(random_name, '\s+', '-', 'g'));
+        random_content := 'Content for ' || random_name;
         
         -- Randomly decide if this category should have a parent
         IF i > 1 AND random() < 0.3 THEN
@@ -209,8 +221,8 @@ BEGIN
         -- You might need to adjust this based on your actual data
         random_image_id := floor(random() * 10 + 1)::INT;
         
-        INSERT INTO categories (name, content, parent_id, image_id)
-        VALUES (random_name, random_content, random_parent_id, random_image_id);
+        INSERT INTO categories (name, slug, content, parent_id, image_id)
+        VALUES (random_name, random_slug, random_content, random_parent_id, random_image_id);
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
@@ -219,6 +231,7 @@ $$ LANGUAGE plpgsql;
 SELECT generate_random_categories(50);
 
 CREATE INDEX idx_categories_name ON categories (name);
+CREATE INDEX idx_categories_slug ON categories (slug);
 CREATE INDEX idx_categories_parent_id ON categories (parent_id);
 CREATE INDEX idx_categories_created_at ON categories (created_at);
 CREATE INDEX idx_categories_updated_at ON categories (updated_at);

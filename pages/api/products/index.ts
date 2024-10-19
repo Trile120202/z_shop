@@ -11,7 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const offset = (page - 1) * limit;
             const search = req.query.search as string;
 
             let query = db('products as p')
@@ -19,6 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .leftJoin('product_categories as pc', 'p.id', 'pc.product_id')
                 .leftJoin('categories as c', 'pc.category_id', 'c.id')
                 .leftJoin('product_images as pi', 'p.id', 'pi.product_id')
+                .leftJoin('images as i2', 'pi.image_id', 'i2.id')
                 .where('p.status', 1)
                 .select(
                     'p.id AS product_id',
@@ -26,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'p.brand',
                     'p.model',
                     'p.price',
+                    'p.slug',
                     'p.description',
                     'p.specifications',
                     'p.stock_quantity',
@@ -37,9 +38,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'i.alt_text AS thumbnail_alt_text',
                     db.raw('STRING_AGG(DISTINCT c.name, \', \') AS categories'),
                     db.raw('ARRAY_AGG(DISTINCT pi.image_id) AS product_image_ids'),
-                    db.raw('ARRAY_AGG(DISTINCT i2.url) AS product_image_urls') // Lấy danh sách URL hình ảnh từ bảng images
+                    db.raw('ARRAY_AGG(DISTINCT i2.url) AS product_image_urls')
                 )
-                .leftJoin('images as i2', 'pi.image_id', 'i2.id') // Join với bảng images để lấy URL
                 .groupBy('p.id', 'i.id');
 
             if (search) {
@@ -49,22 +49,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 });
             }
 
-            const [count] = await query.clone().count('* as total');
-            const totalItems = count.total as number;
+            let countQuery = db('products as p').where('p.status', 1);
+
+            if (search) {
+                countQuery = countQuery.where((builder) => {
+                    builder.where('p.name', 'ilike', `%${search}%`)
+                        .orWhere('p.description', 'ilike', `%${search}%`);
+                });
+            }
+
+            const [countResult] = await countQuery.clone().count('* as total');
+            const totalItems = parseInt(countResult.total as string, 10);
+
+            const totalPages = totalItems > 0 ? Math.ceil(totalItems / limit) : 1;
+
+            const adjustedPage = Math.min(page, totalPages);
+            const adjustedOffset = (adjustedPage - 1) * limit;
 
             const products = await query
                 .orderBy('p.created_at', 'desc')
-                .offset(offset)
-                .limit(limit);
-
-            const totalPages = Math.ceil(totalItems / limit);
+                .limit(limit)
+                .offset(adjustedOffset);
 
             res.status(StatusCode.OK).json(transformResponse({
                 data: products,
                 message: 'Products retrieved successfully.',
                 statusCode: StatusCode.OK,
                 pagination: {
-                    currentPage: page,
+                    currentPage: adjustedPage,
                     pageSize: limit,
                     totalItems,
                     totalPages,

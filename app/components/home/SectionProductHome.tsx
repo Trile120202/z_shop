@@ -16,6 +16,7 @@ interface Product {
     brand: string;
     model: string;
     price: string;
+    slug: string;
     description: string;
     specifications: Specification;
     stock_quantity: number;
