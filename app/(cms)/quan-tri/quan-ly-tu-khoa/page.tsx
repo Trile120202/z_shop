@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -30,29 +30,50 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import useFetch from "@/lib/useFetch";
+import {CreateTagModal} from "@/app/components/CreateTagModal"
+import Loading from "@/app/components/Loading";
+
+interface Tag {
+  id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  status: number;
+}
+
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: string;
+  itemsPerPage: number;
+}
+
+interface TagsResponse {
+  status: number;
+  message: string;
+  data: {
+    tags: Tag[];
+    pagination: Pagination;
+  };
+}
 
 const Page = () => {
-    const keywordsData = [
-        { id: 1, keyword: 'Smartphone', usage: 150, totalAmount: '$3000', status: 'Hoạt động' },
-        { id: 2, keyword: 'Laptop', usage: 120, totalAmount: '$4500', status: 'Hoạt động' },
-        { id: 3, keyword: 'Headphones', usage: 80, totalAmount: '$1600', status: 'Không hoạt động' },
-        { id: 4, keyword: 'Smart Watch', usage: 60, totalAmount: '$1200', status: 'Hoạt động' },
-        { id: 5, keyword: 'Tablet', usage: 40, totalAmount: '$2000', status: 'Không hoạt động' },
-    ];
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit, setLimit] = useState<number>(10);
+
+    const { data, loading, error } = useFetch<TagsResponse>(`/api/tag?limit=${limit}&page=${currentPage}`);
 
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
-        { accessor: 'keyword', label: 'Từ khóa', className: 'font-medium' },
-        { accessor: 'usage', label: 'Số lần sử dụng', className: 'text-right' },
-        { accessor: 'totalAmount', label: 'Tổng doanh thu', className: 'text-right' },
+        { accessor: 'name', label: 'Từ khóa', className: 'font-medium' },
+        { accessor: 'created_at', label: 'Ngày tạo', className: 'text-right' },
+        { accessor: 'updated_at', label: 'Ngày cập nhật', className: 'text-right' },
         { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
         { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
     ];
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 5;
-    const [selectedStatus, setSelectedStatus] = useState<string>('all');
-    const [searchKeyword, setSearchKeyword] = useState<string>('');
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -66,28 +87,41 @@ const Page = () => {
         console.log(`Delete keyword with id: ${id}`);
     };
 
-    const handleCreate = () => {
-        console.log('Create new keyword');
+    const handleCreate = (newTag: Tag) => {
+        console.log('New tag created:', newTag);
     };
 
-    const getStatusColor = (status: string) => {
-        return status === 'Hoạt động' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    const getStatusColor = (status: number) => {
+        return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
-    const filteredKeywords = keywordsData.filter(keyword => 
-        (selectedStatus === 'all' || keyword.status === selectedStatus) &&
-        (searchKeyword === '' || keyword.keyword.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
+    const getStatusText = (status: number) => {
+        return status === 1 ? 'Hoạt động' : 'Không hoạt động';
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    };
+
+    const filteredTags = data?.data.tags.filter(tag => 
+        (selectedStatus === 'all' || tag.status.toString() === selectedStatus) &&
+        (searchKeyword === '' || tag.name.toLowerCase().includes(searchKeyword.toLowerCase()))
+    ) || [];
+
+    if (loading) return <Loading />;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <Card className="w-full shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl font-bold">Quản lý từ khóa</CardTitle>
-                    <Button onClick={handleCreate} className="bg-green-500 hover:bg-green-600 transition duration-300">
-                        <FaPlus className="mr-2 h-4 w-4" />
-                        Tạo mới
-                    </Button>
+                    <CreateTagModal onCreate={handleCreate} />
                 </div>
             </CardHeader>
             <CardContent className="pt-6">
@@ -99,8 +133,8 @@ const Page = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Tất cả</SelectItem>
-                                <SelectItem value="Hoạt động">Hoạt động</SelectItem>
-                                <SelectItem value="Không hoạt động">Không hoạt động</SelectItem>
+                                <SelectItem value="1">Hoạt động</SelectItem>
+                                <SelectItem value="0">Không hoạt động</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -112,6 +146,20 @@ const Page = () => {
                             className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                    <div className="relative">
+                        <Select onValueChange={(value) => setLimit(Number(value))} defaultValue={limit.toString()}>
+                            <SelectTrigger className="w-[150px] border-2 border-gray-300 rounded-lg">
+                                <SelectValue placeholder="Số lượng hiển thị" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="4">4</SelectItem>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="20">20</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
@@ -126,7 +174,7 @@ const Page = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredKeywords.map((row, index) => (
+                            {filteredTags.map((row, index) => (
                                 <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
                                     {columns.map((col, colIndex) => (
                                         <TableCell 
@@ -154,8 +202,10 @@ const Page = () => {
                                                 </DropdownMenu>
                                             ) : col.accessor === 'status' ? (
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {row.status}
+                                                    {getStatusText(row.status)}
                                                 </span>
+                                            ) : col.accessor === 'created_at' || col.accessor === 'updated_at' ? (
+                                                formatDate(row[col.accessor])
                                             ) : (
                                                 row[col.accessor as keyof typeof row]
                                             )}
@@ -169,9 +219,13 @@ const Page = () => {
                 <Pagination className="mt-6">
                     <PaginationContent>
                         <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
+                            <PaginationPrevious 
+                                href="#" 
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                            />
                         </PaginationItem>
-                        {[...Array(totalPages)].map((_, index) => (
+                        {[...Array(data?.data.pagination.totalPages)].map((_, index) => (
                             <PaginationItem key={index}>
                                 <PaginationLink 
                                     href="#"
@@ -183,7 +237,11 @@ const Page = () => {
                             </PaginationItem>
                         ))}
                         <PaginationItem>
-                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
+                            <PaginationNext 
+                                href="#" 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                className={currentPage === data?.data.pagination.totalPages ? 'pointer-events-none opacity-50' : ''}
+                            />
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>

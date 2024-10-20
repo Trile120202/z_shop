@@ -7,4 +7,6 @@ export enum StatusCode {
     NOT_FOUND = 404,
     INTERNAL_SERVER_ERROR = 500,
     METHOD_NOT_ALLOWED  = 501,
+    CONFLICT,
+
 }
