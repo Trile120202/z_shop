@@ -47,7 +47,7 @@ interface ApiResponse {
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col h-full">
-            <Link href={`/product/${product.product_id}`} className="flex-grow">
+            <Link href={`/san-pham/${product.slug}`} className="flex-grow">
                 <div className="relative w-full h-48">
                     <Image
                         src={product.thumbnail_url}
