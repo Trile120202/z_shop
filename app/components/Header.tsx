@@ -31,7 +31,7 @@ export default function Header() {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      router.push(`/san-pham/${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/san-pham?search=${encodeURIComponent(searchQuery.trim())}`);
       handleSearchCollapse();
     }
   };

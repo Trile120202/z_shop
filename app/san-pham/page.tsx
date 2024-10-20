@@ -91,11 +91,11 @@ const ProductCard: React.FC<{ product: Product }> = ({product}) => {
 const ProductsPage: React.FC = () => {
     const searchParams = useSearchParams();
     // @ts-ignore
-    const tag = searchParams.get('tag') ?? '';
+    const search = searchParams.get('search') ?? '';
 
 
     const [currentPage, setCurrentPage] = React.useState(1);
-    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&tag=${tag}`);
+    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&search=${search}`);
 
     if (loading) return <Loading/>;
     if (error) return notFound();
@@ -106,7 +106,7 @@ const ProductsPage: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold my-8 text-black">Sản phẩm {tag}</h1>
+            <h1 className="text-3xl font-bold my-8 text-black">Sản phẩm {search}</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {data?.data.map((product) => (
                     <ProductCard key={product.product_id} product={product}/>
