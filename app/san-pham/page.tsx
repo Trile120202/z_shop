@@ -7,6 +7,7 @@ import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
 import Loading from "@/app/components/Loading";
+import {notFound, useSearchParams} from "next/navigation";
 
 interface Specification {
     weight: string;
@@ -88,12 +89,16 @@ const ProductCard: React.FC<{ product: Product }> = ({product}) => {
 };
 
 const ProductsPage: React.FC = () => {
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12`);
+    const searchParams = useSearchParams();
+    // @ts-ignore
+    const tag = searchParams.get('tag') ?? '';
 
-    if (loading) return <Loading/>
-        ;
-    if (error) return <div className="text-black">Lỗi: {error}</div>;
+
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12&tag=${tag}`);
+
+    if (loading) return <Loading/>;
+    if (error) return notFound();
 
     const handlePageChange = (selectedItem: { selected: number }) => {
         setCurrentPage(selectedItem.selected + 1);
@@ -101,7 +106,7 @@ const ProductsPage: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold my-8 text-black">Sản phẩm</h1>
+            <h1 className="text-3xl font-bold my-8 text-black">Sản phẩm {tag}</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {data?.data.map((product) => (
                     <ProductCard key={product.product_id} product={product}/>
