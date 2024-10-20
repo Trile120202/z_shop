@@ -6,6 +6,7 @@ import useFetch from "@/lib/useFetch";
 import { motion } from 'framer-motion';
 import Loading from "@/app/components/Loading";
 
+
 interface Specifications {
   weight: string;
   dimensions: string;
@@ -50,7 +51,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (loading) return <Loading/>;
-  if (error) return <div className="text-red-500 text-center py-20 text-2xl">Lỗi: {error}</div>;
+  if (error)   return notFound();
+
   if (!data || !data.data) return notFound();
 
   const product = data.data;
