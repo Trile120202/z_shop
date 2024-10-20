@@ -47,7 +47,7 @@ interface ApiResponse {
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col h-full">
-            <Link href={`/san-pham/${product.slug}`} className="flex-grow">
+            <Link href={`/app/(client)/san-pham/${product.slug}`} className="flex-grow">
                 <div className="relative w-full h-48">
                     <Image
                         src={product.thumbnail_url}
@@ -88,7 +88,7 @@ const SectionProductHome: React.FC = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <h2 className="text-2xl font-bold mb-6 text-black">Featured Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {data?.data.map((product) => (
                     <ProductCard key={product.product_id} product={product} />
                 ))}

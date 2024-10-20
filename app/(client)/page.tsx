@@ -1,5 +1,5 @@
-import Carousel from './components/Carousel';
-import CategoryHome from './components/home/CategoryHome';
+import Carousel from '../components/Carousel';
+import CategoryHome from '../components/home/CategoryHome';
 import SectionProductHome from "@/app/components/home/SectionProductHome";
 
 export default function Home() {
