@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList} from 'react-icons/fa';
+import {FaHome, FaBox, FaUsers, FaCog, FaTags, FaImage, FaList, FaShoppingCart} from 'react-icons/fa';
 import {FaImages} from "react-icons/fa6";
 
 const Sidebar = () => {
@@ -37,6 +37,12 @@ const Sidebar = () => {
                         <Link href="/quan-tri/quan-ly-media" className="flex items-center p-2 hover:bg-gray-700 rounded">
                             <FaImage className="mr-3" />
                             Quản lý media
+                        </Link>
+                    </li>
+                    <li className="mb-4">
+                        <Link href="/quan-tri/quan-ly-don-hang" className="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <FaShoppingCart className="mr-3" />
+                            Quản lý đơn hàng
                         </Link>
                     </li>
                     <li className="mb-4">
