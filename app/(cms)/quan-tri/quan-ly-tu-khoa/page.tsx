@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Table,
     TableBody,
@@ -33,6 +33,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import useFetch from "@/lib/useFetch";
 import {CreateTagModal} from "@/app/components/CreateTagModal"
 import Loading from "@/app/components/Loading";
+import { debounce } from 'lodash';
 
 interface Tag {
   id: number;
@@ -62,9 +63,21 @@ const Page = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
 
-    const { data, loading, error } = useFetch<TagsResponse>(`/api/tag?limit=${limit}&page=${currentPage}`);
+    const { data, loading, error } = useFetch<TagsResponse>(`/api/tag?limit=${limit}&page=${currentPage}&search=${debouncedSearchKeyword}`);
+
+    const debouncedSearch = useCallback(
+        debounce((value: string) => {
+            setDebouncedSearchKeyword(value);
+        }, 2000),
+        []
+    );
+
+    useEffect(() => {
+        debouncedSearch(searchKeyword);
+    }, [searchKeyword, debouncedSearch]);
 
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
@@ -109,8 +122,7 @@ const Page = () => {
     };
 
     const filteredTags = data?.data.tags.filter(tag => 
-        (selectedStatus === 'all' || tag.status.toString() === selectedStatus) &&
-        (searchKeyword === '' || tag.name.toLowerCase().includes(searchKeyword.toLowerCase()))
+        (selectedStatus === 'all' || tag.status.toString() === selectedStatus)
     ) || [];
 
     if (loading) return <Loading />;
