@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
-import Loading from "@/app/components/Loading";
 
 interface Category {
   image_url: string;
