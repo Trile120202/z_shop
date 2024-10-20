@@ -13,6 +13,7 @@ export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
@@ -36,11 +37,19 @@ export default function Header() {
     setTimeout(() => {
       searchInputRef.current?.focus();
     }, 300);
+    collapseTimeoutRef.current = setTimeout(() => {
+      if (!searchQuery.trim()) {
+        handleSearchCollapse();
+      }
+    }, 10000);
   };
 
   const handleSearchCollapse = () => {
     setIsSearchExpanded(false);
     setSearchQuery('');
+    if (collapseTimeoutRef.current) {
+      clearTimeout(collapseTimeoutRef.current);
+    }
   };
 
   const handleSearch = () => {
@@ -56,6 +65,9 @@ export default function Header() {
       clearTimeout(searchTimeoutRef.current);
     }
     searchTimeoutRef.current = setTimeout(handleSearch, 1500);
+    if (collapseTimeoutRef.current) {
+      clearTimeout(collapseTimeoutRef.current);
+    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -67,6 +79,9 @@ export default function Header() {
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
+      }
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current);
       }
     };
   }, []);
@@ -153,16 +168,16 @@ export default function Header() {
         >
           <ul className="flex flex-col space-y-2 items-center">
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/" className="text-white hover:text-yellow-300 transition duration-300 block">Trang chủ</Link>
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-yellow-300 transition duration-300 block">Trang chủ</Link>
             </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/gioi-thieu" className="text-white hover:text-yellow-300 transition duration-300 block">Giới thiệu</Link>
+              <Link href="/gioi-thieu" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-yellow-300 transition duration-300 block">Giới thiệu</Link>
             </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/lien-he" className="text-white hover:text-yellow-300 transition duration-300 block">Liên hệ</Link>
+              <Link href="/lien-he" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-yellow-300 transition duration-300 block">Liên hệ</Link>
             </motion.li>
             <li className="relative w-full">
-              <form onSubmit={handleSearchSubmit} className="flex items-center">
+              <form onSubmit={(e) => { handleSearchSubmit(e); setIsMenuOpen(false); }} className="flex items-center">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: '100%' }}
@@ -191,14 +206,14 @@ export default function Header() {
             </li>
             <motion.li whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
               <button
-                onClick={openAuthModal}
+                onClick={() => { openAuthModal(); setIsMenuOpen(false); }}
                 className="bg-white text-blue-700 px-4 py-2 rounded hover:bg-yellow-300 hover:text-blue-800 transition duration-300 w-full flex items-center justify-center"
               >
                 Đăng nhập
               </button>
             </motion.li>
             <motion.li whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
-              <Link href="/gio-hang" className="flex items-center justify-center text-white hover:text-yellow-300 transition duration-300 block">
+              <Link href="/gio-hang" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center text-white hover:text-yellow-300 transition duration-300 block">
                 <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
