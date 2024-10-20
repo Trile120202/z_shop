@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
+import Loading from "@/app/components/Loading";
 
 interface Specification {
     weight: string;
@@ -81,7 +82,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 const SectionProductHome: React.FC = () => {
     const { data, loading, error } = useFetch<ApiResponse>('/api/products');
 
-    if (loading) return <div className="text-black">Loading...</div>;
+    if (loading) return <Loading/>;
     if (error) return <div className="text-black">Error: {error}</div>;
 
     return (

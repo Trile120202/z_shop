@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import useFetch from "@/lib/useFetch";
 import { motion } from 'framer-motion';
+import Loading from "@/app/components/Loading";
 
 interface Specifications {
   weight: string;
@@ -48,7 +49,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { data, loading, error } = useFetch<ApiResponse>(`/api/products/${slug}`);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (loading) return <div className="text-black text-center py-20 text-2xl">Đang tải...</div>;
+  if (loading) return <Loading/>;
   if (error) return <div className="text-red-500 text-center py-20 text-2xl">Lỗi: {error}</div>;
   if (!data || !data.data) return notFound();
 

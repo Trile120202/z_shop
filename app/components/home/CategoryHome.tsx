@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
+import Loading from "@/app/components/Loading";
 
 interface Category {
   image_url: string;
@@ -35,7 +36,7 @@ const CategoryHome: React.FC = () => {
     };
   }, []);
 
-  if (loading) return <div className="text-black">Loading...</div>;
+  if (loading) return <div></div>;
   if (error) return <div className="text-black">Error: {error}</div>;
 
   const filteredCategories = data?.data?.filter(category =>
@@ -87,7 +88,7 @@ const CategoryHome: React.FC = () => {
                   objectFit="cover"
                 />
               </div>
-              <h3 className="text-sm font-semibold truncate px-3 text-black">{category.name} (ID: {category.id})</h3>
+              <h3 className="text-sm font-semibold truncate px-3 text-black">{category.name}</h3>
             </Link>
           ))}
         </div>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import useFetch from "@/lib/useFetch";
 import {FaCreditCard, FaShoppingCart} from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
+import Loading from "@/app/components/Loading";
 
 interface Specification {
     weight: string;
@@ -90,7 +91,8 @@ const ProductsPage: React.FC = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const {data, loading, error} = useFetch<ApiResponse>(`/api/products?page=${currentPage}&limit=12`);
 
-    if (loading) return <div className="text-black">Đang tải...</div>;
+    if (loading) return <Loading/>
+        ;
     if (error) return <div className="text-black">Lỗi: {error}</div>;
 
     const handlePageChange = (selectedItem: { selected: number }) => {

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Loading from "@/app/components/Loading";
 
 interface CartItem {
   id: number;
@@ -16,7 +17,6 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching cart items from an API
     setTimeout(() => {
       setCartItems([
         { id: 1, name: "Product 1", price: 19.99, quantity: 2, image: "/product1.jpg" },
@@ -40,13 +40,7 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full"
-        />
-      </div>
+     <Loading/>
     );
   }
 
