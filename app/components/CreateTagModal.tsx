@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -25,6 +25,26 @@ export const CreateTagModal = ({ onCreate }: { onCreate: (newTag: Tag) => void }
         body: { name: tagName, status: Number(tagStatus) }
     });
 
+    useEffect(() => {
+        if (data) {
+            onCreate(data.data);
+            toast({
+                title: "Thành công",
+                description: "Tạo từ khóa thành công!",
+            });
+            setTagName('');
+            setTagStatus('1');
+            setOpen(false);
+        }
+        if (error) {
+            toast({
+                title: "Lỗi",
+                description: 'Không thể tạo từ khóa',
+                variant: "destructive",
+            });
+        }
+    }, [data, error, onCreate, toast]);
+
     const handleSubmit = async () => {
         if (!tagName.trim()) {
             toast({
@@ -35,37 +55,7 @@ export const CreateTagModal = ({ onCreate }: { onCreate: (newTag: Tag) => void }
             return;
         }
 
-        try {
-            const response = await fetch('/api/tag', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: tagName, status: Number(tagStatus) }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const result = await response.json();
-            onCreate(result.data);
-            toast({
-                title: "Thành công",
-                description: "Tạo từ khóa thành công!",
-            });
-            setTagName('');
-            setTagStatus('1');
-            setOpen(false);
-            
-            window.location.reload();
-        } catch (error) {
-            toast({
-                title: "Lỗi",
-                description: 'Không thể tạo từ khóa',
-                variant: "destructive",
-            });
-        }
+        fetchData();
     };
 
     return (

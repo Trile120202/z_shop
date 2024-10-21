@@ -30,10 +30,12 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import useFetch from "@/lib/useFetch";
+import { Switch } from "@/components/ui/switch"
 import {CreateTagModal} from "@/app/components/CreateTagModal"
+import {EditTagModal} from "@/app/components/EditTagModal"
 import Loading from "@/app/components/Loading";
 import { debounce } from 'lodash';
+import useSWR from 'swr';
 
 interface Tag {
   id: number;
@@ -59,18 +61,28 @@ interface TagsResponse {
   };
 }
 
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 const Page = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
     const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState<string>('');
     const [limit, setLimit] = useState<number>(10);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
 
-    const { data, loading, error } = useFetch<TagsResponse>(`/api/tag?limit=${limit}&page=${currentPage}&search=${debouncedSearchKeyword}`);
+    const { data, error, mutate } = useSWR<TagsResponse>(
+        `/api/tag?limit=${limit}&page=${currentPage}&search=${debouncedSearchKeyword}&status=${selectedStatus}`,
+        fetcher
+    );
+
+    const loading = !data && !error;
 
     const debouncedSearch = useCallback(
         debounce((value: string) => {
             setDebouncedSearchKeyword(value);
+            setCurrentPage(1);
         }, 2000),
         []
     );
@@ -78,6 +90,11 @@ const Page = () => {
     useEffect(() => {
         debouncedSearch(searchKeyword);
     }, [searchKeyword, debouncedSearch]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+        mutate();
+    }, [selectedStatus, mutate]);
 
     const columns = [
         { accessor: 'id', label: 'ID', className: 'font-medium' },
@@ -92,8 +109,9 @@ const Page = () => {
         setCurrentPage(page);
     };
 
-    const handleEdit = (id: number) => {
-        console.log(`Edit keyword with id: ${id}`);
+    const handleEdit = (tag: Tag) => {
+        setSelectedTag(tag);
+        setIsEditModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
@@ -102,6 +120,33 @@ const Page = () => {
 
     const handleCreate = (newTag: Tag) => {
         console.log('New tag created:', newTag);
+        mutate();
+    };
+
+    const handleUpdate = (updatedTag: Tag) => {
+        console.log('Tag updated:', updatedTag);
+        mutate();
+        setIsEditModalOpen(false);
+    };
+
+    const handleStatusChange = async (id: number, newStatus: number) => {
+        try {
+            const response = await fetch('/api/tag', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id, status: newStatus }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update status');
+            }
+
+            mutate();
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
     };
 
     const getStatusColor = (status: number) => {
@@ -121,12 +166,8 @@ const Page = () => {
         });
     };
 
-    const filteredTags = data?.data.tags.filter(tag => 
-        (selectedStatus === 'all' || tag.status.toString() === selectedStatus)
-    ) || [];
-
     if (loading) return <Loading />;
-    if (error) return <div>Error: {error}</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     return (
         <Card className="w-full shadow-lg">
@@ -139,7 +180,10 @@ const Page = () => {
             <CardContent className="pt-6">
                 <div className="flex space-x-4 mb-6">
                     <div className="relative">
-                        <Select onValueChange={setSelectedStatus} defaultValue="all">
+                        <Select onValueChange={(value) => {
+                            setSelectedStatus(value);
+                            setCurrentPage(1);
+                        }} defaultValue={selectedStatus}>
                             <SelectTrigger className="w-[200px] border-2 border-gray-300 rounded-lg">
                                 <SelectValue placeholder="Chọn trạng thái" />
                             </SelectTrigger>
@@ -186,7 +230,7 @@ const Page = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredTags.map((row, index) => (
+                            {data?.data.tags.map((row, index) => (
                                 <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
                                     {columns.map((col, colIndex) => (
                                         <TableCell 
@@ -202,7 +246,7 @@ const Page = () => {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                                        <DropdownMenuItem onClick={() => handleEdit(row)}>
                                                             <FaEdit className="mr-2 h-4 w-4" />
                                                             <span>Sửa</span>
                                                         </DropdownMenuItem>
@@ -213,9 +257,15 @@ const Page = () => {
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             ) : col.accessor === 'status' ? (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {getStatusText(row.status)}
-                                                </span>
+                                                <div className="flex items-center space-x-2">
+                                                    <Switch
+                                                        checked={row.status === 1}
+                                                        onCheckedChange={(checked) => handleStatusChange(row.id, checked ? 1 : 0)}
+                                                    />
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                                                        {getStatusText(row.status)}
+                                                    </span>
+                                                </div>
                                             ) : col.accessor === 'created_at' || col.accessor === 'updated_at' ? (
                                                 formatDate(row[col.accessor])
                                             ) : (
@@ -258,6 +308,13 @@ const Page = () => {
                     </PaginationContent>
                 </Pagination>
             </CardContent>
+            {isEditModalOpen && selectedTag && (
+                <EditTagModal
+                    tag={selectedTag}
+                    onUpdate={handleUpdate}
+                    onClose={() => setIsEditModalOpen(false)}
+                />
+            )}
         </Card>
     );
 };

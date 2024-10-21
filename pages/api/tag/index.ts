@@ -12,14 +12,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const offset = (page - 1) * limit;
+            const search = req.query.search as string;
+            const status = req.query.status as string;
+
+            let query = db('tags');
+
+            if (search) {
+                query = query.whereRaw('LOWER(name) LIKE ?', [`%${search.toLowerCase()}%`]);
+            }
+
+            if (status && status !== 'all') {
+                query = query.where('status', parseInt(status));
+            }
 
             const [tags, totalResult] = await Promise.all([
-                db('tags')
+                query.clone()
                     .select('*')
-                    .where('status', 1)
+                    .orderBy('id', 'desc')
                     .limit(limit)
                     .offset(offset),
-                db('tags').where('status', 1).count('* as count').first()
+                query.clone().count('* as count').first()
             ]);
 
             const total = totalResult?.count as number;
@@ -48,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const { name } = req.body;
+            const { name, status } = req.body;
 
             if (!name) {
                 return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
@@ -58,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }));
             }
 
-            const existingTag = await db('tags').where('name', name).first();
+            const existingTag = await db('tags').whereRaw('LOWER(name) = ?', [name.toLowerCase()]).first();
             if (existingTag) {
                 return res.status(StatusCode.CONFLICT).json(transformResponse({
                     data: null,
@@ -68,7 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             const [newTag] = await db('tags')
-                .insert({ name, status: 1 })
+                .insert({ name, status: status || 1 })
                 .returning('*');
 
             res.status(StatusCode.CREATED).json(transformResponse({
@@ -84,8 +96,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
+    } else if (req.method === 'PATCH') {
+        try {
+            const { id, status } = req.body;
+
+            if (!id || status === undefined) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Tag ID and status are required.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            const updatedTag = await db('tags')
+                .where({ id })
+                .update({ status })
+                .returning('*');
+
+            if (updatedTag.length === 0) {
+                return res.status(StatusCode.NOT_FOUND).json(transformResponse({
+                    data: null,
+                    message: 'Tag not found.',
+                    statusCode: StatusCode.NOT_FOUND,
+                }));
+            }
+
+            res.status(StatusCode.OK).json(transformResponse({
+                data: updatedTag[0],
+                message: 'Tag status updated successfully.',
+                statusCode: StatusCode.OK,
+            }));
+        } catch (error) {
+            console.error(error);
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
+                data: null,
+                message: 'An error occurred while updating the tag status.',
+                statusCode: StatusCode.INTERNAL_SERVER_ERROR,
+            }));
+        }
     } else {
-        res.setHeader('Allow', ['GET', 'POST']);
+        res.setHeader('Allow', ['GET', 'POST', 'PATCH']);
         return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }
