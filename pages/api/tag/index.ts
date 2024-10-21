@@ -96,6 +96,55 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusCode: StatusCode.INTERNAL_SERVER_ERROR,
             }));
         }
+    } else if (req.method === 'PUT') {
+        try {
+            const { id, name, status } = req.body;
+
+            if (!id || !name) {
+                return res.status(StatusCode.BAD_REQUEST).json(transformResponse({
+                    data: null,
+                    message: 'Tag ID and name are required.',
+                    statusCode: StatusCode.BAD_REQUEST,
+                }));
+            }
+
+            const existingTag = await db('tags')
+                .whereRaw('LOWER(name) = ? AND id != ?', [name.toLowerCase(), id])
+                .first();
+            if (existingTag) {
+                return res.status(StatusCode.CONFLICT).json(transformResponse({
+                    data: null,
+                    message: 'Another tag with this name already exists.',
+                    statusCode: StatusCode.CONFLICT,
+                }));
+            }
+
+            const [updatedTag] = await db('tags')
+                .where({ id })
+                .update({ name, status: status !== undefined ? status : 1 })
+                .returning('*');
+
+            if (!updatedTag) {
+                return res.status(StatusCode.NOT_FOUND).json(transformResponse({
+                    data: null,
+                    message: 'Tag not found.',
+                    statusCode: StatusCode.NOT_FOUND,
+                }));
+            }
+
+            res.status(StatusCode.OK).json(transformResponse({
+                data: updatedTag,
+                message: 'Tag updated successfully.',
+                statusCode: StatusCode.OK,
+            }));
+        } catch (error) {
+            console.error(error);
+            return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(transformResponse({
+                data: null,
+                message: 'An error occurred while updating the tag.',
+                statusCode: StatusCode.INTERNAL_SERVER_ERROR,
+            }));
+        }
     } else if (req.method === 'PATCH') {
         try {
             const { id, status } = req.body;
@@ -135,7 +184,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }));
         }
     } else {
-        res.setHeader('Allow', ['GET', 'POST', 'PATCH']);
+        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'PATCH']);
         return res.status(StatusCode.METHOD_NOT_ALLOWED).end(`Method ${req.method} Not Allowed`);
     }
 }

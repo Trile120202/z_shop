@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -29,28 +29,47 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import useApi from '@/lib/useApi';
+
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    content: string;
+    parent_id: number | null;
+    image_id: number;
+    created_at: string;
+    updated_at: string;
+    status: number;
+}
+
+interface Pagination {
+    currentPage: number;
+    pageSize: number;
+    totalItems: string;
+    totalPages: number;
+}
+
+interface ApiResponse {
+    status: number;
+    message: string;
+    data: Category[];
+    pagination: Pagination;
+}
 
 const Page = () => {
-    const productCategoriesData = [
-        { id: 1, name: 'Điện thoại', productCount: 150, status: 'Hoạt động' },
-        { id: 2, name: 'Laptop', productCount: 120, status: 'Hoạt động' },
-        { id: 3, name: 'Tai nghe', productCount: 80, status: 'Không hoạt động' },
-        { id: 4, name: 'Đồng hồ thông minh', productCount: 60, status: 'Hoạt động' },
-        { id: 5, name: 'Máy tính bảng', productCount: 40, status: 'Không hoạt động' },
-    ];
-
-    const columns = [
-        { accessor: 'id', label: 'ID', className: 'font-medium' },
-        { accessor: 'name', label: 'Tên loại sản phẩm', className: 'font-medium' },
-        { accessor: 'productCount', label: 'Số lượng sản phẩm', className: 'text-right' },
-        { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
-        { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
-    ];
-
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 5;
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const [limit, setLimit] = useState<number>(10);
+
+    const { data, loading, error, fetchData } = useApi<ApiResponse>(`/api/categories?page=${currentPage}&limit=${limit}&search=${searchKeyword}${selectedStatus !== 'all' ? `&status=${selectedStatus}` : ''}`, {
+        method: 'GET'
+    });
+
+    useEffect(() => {
+        fetchData();
+    }, [currentPage, selectedStatus, searchKeyword, limit]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -68,14 +87,16 @@ const Page = () => {
         console.log('Create new product category');
     };
 
-    const getStatusColor = (status: string) => {
-        return status === 'Hoạt động' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    const getStatusColor = (status: number) => {
+        return status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
-    const filteredCategories = productCategoriesData.filter(category => 
-        (selectedStatus === 'all' || category.status === selectedStatus) &&
-        (searchKeyword === '' || category.name.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
+    const columns = [
+        { accessor: 'id', label: 'ID', className: 'font-medium' },
+        { accessor: 'name', label: 'Tên loại sản phẩm', className: 'font-medium' },
+        { accessor: 'status', label: 'Trạng thái', className: 'text-center' },
+        { accessor: 'actions', label: 'Thao tác', className: 'text-right' },
+    ];
 
     return (
         <Card className="w-full shadow-lg">
@@ -97,8 +118,8 @@ const Page = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Tất cả</SelectItem>
-                                <SelectItem value="Hoạt động">Hoạt động</SelectItem>
-                                <SelectItem value="Không hoạt động">Không hoạt động</SelectItem>
+                                <SelectItem value="1">Hoạt động</SelectItem>
+                                <SelectItem value="0">Không hoạt động</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -110,6 +131,20 @@ const Page = () => {
                             className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg"
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                    <div className="relative">
+                        <Select onValueChange={(value) => setLimit(Number(value))} defaultValue={limit.toString()}>
+                            <SelectTrigger className="w-[150px] border-2 border-gray-300 rounded-lg">
+                                <SelectValue placeholder="Số lượng hiển thị" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="4">4</SelectItem>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="20">20</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
@@ -124,67 +159,97 @@ const Page = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredCategories.map((row, index) => (
-                                <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
-                                    {columns.map((col, colIndex) => (
-                                        <TableCell 
-                                            key={colIndex} 
-                                            className={`${col.className} py-4`}
-                                        >
-                                            {col.accessor === 'actions' ? (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <BsThreeDots className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(row.id)}>
-                                                            <FaEdit className="mr-2 h-4 w-4" />
-                                                            <span>Sửa</span>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDelete(row.id)}>
-                                                            <FaTrash className="mr-2 h-4 w-4" />
-                                                            <span>Xóa</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            ) : col.accessor === 'status' ? (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
-                                                    {row.status}
-                                                </span>
-                                            ) : (
-                                                row[col.accessor as keyof typeof row]
-                                            )}
-                                        </TableCell>
-                                    ))}
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center py-4">
+                                        Đang tải...
+                                    </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : error ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center py-4 text-red-500">
+                                        Đã xảy ra lỗi khi tải dữ liệu.
+                                    </TableCell>
+                                </TableRow>
+                            ) : data?.data.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center py-4">
+                                        Không có dữ liệu.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                data?.data.map((row, index) => (
+                                    <TableRow key={index} className="hover:bg-gray-50 transition duration-150">
+                                        {columns.map((col, colIndex) => (
+                                            <TableCell 
+                                                key={colIndex} 
+                                                className={`${col.className} py-4`}
+                                            >
+                                                {col.accessor === 'actions' ? (
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <BsThreeDots className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => handleEdit(row.id)}>
+                                                                <FaEdit className="mr-2 h-4 w-4" />
+                                                                <span>Sửa</span>
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleDelete(row.id)}>
+                                                                <FaTrash className="mr-2 h-4 w-4" />
+                                                                <span>Xóa</span>
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                ) : col.accessor === 'status' ? (
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(row.status)}`}>
+                                                        {row.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                                                    </span>
+                                                ) : (
+                                                    row[col.accessor as keyof typeof row]
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </div>
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
-                        </PaginationItem>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <PaginationItem key={index}>
-                                <PaginationLink 
-                                    href="#"
-                                    onClick={() => handlePageChange(index + 1)}
-                                    isActive={currentPage === index + 1}
-                                >
-                                    {index + 1}
-                                </PaginationLink>
+                {data?.pagination && (
+                    <Pagination className="mt-6">
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious 
+                                    href="#" 
+                                    onClick={() => handlePageChange(data.pagination.currentPage - 1)}
+                                    disabled={data.pagination.currentPage === 1}
+                                />
                             </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                            {[...Array(data.pagination.totalPages)].map((_, index) => (
+                                <PaginationItem key={index}>
+                                    <PaginationLink 
+                                        href="#"
+                                        onClick={() => handlePageChange(index + 1)}
+                                        isActive={data.pagination.currentPage === index + 1}
+                                    >
+                                        {index + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationNext 
+                                    href="#" 
+                                    onClick={() => handlePageChange(data.pagination.currentPage + 1)}
+                                    disabled={data.pagination.currentPage === data.pagination.totalPages}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                )}
             </CardContent>
         </Card>
     );
