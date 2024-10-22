@@ -1,0 +1,824 @@
+-- Adminer 4.8.1 PostgreSQL 14.13 (Debian 14.13-1.pgdg120+1) dump
+
+DROP TABLE IF EXISTS "categories";
+DROP SEQUENCE IF EXISTS categories_id_seq;
+CREATE SEQUENCE categories_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."categories" (
+    "id" integer DEFAULT nextval('categories_id_seq') NOT NULL,
+    "name" character varying(100) NOT NULL,
+    "slug" character varying(100) NOT NULL,
+    "content" text,
+    "parent_id" integer,
+    "image_id" integer,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "categories_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "categories_slug_key" UNIQUE ("slug")
+) WITH (oids = false);
+
+CREATE INDEX "idx_categories_created_at" ON "public"."categories" USING btree ("created_at");
+
+CREATE INDEX "idx_categories_name" ON "public"."categories" USING btree ("name");
+
+CREATE INDEX "idx_categories_parent_id" ON "public"."categories" USING btree ("parent_id");
+
+CREATE INDEX "idx_categories_slug" ON "public"."categories" USING btree ("slug");
+
+CREATE INDEX "idx_categories_status" ON "public"."categories" USING btree ("status");
+
+CREATE INDEX "idx_categories_updated_at" ON "public"."categories" USING btree ("updated_at");
+
+INSERT INTO "categories" ("id", "name", "slug", "content", "parent_id", "image_id", "created_at", "updated_at", "status") VALUES
+(2,	'HP',	'laptop-HP',	NULL,	NULL,	1004,	'2024-10-21 08:49:14.248783',	'2024-10-21 08:49:14.248783',	1),
+(1,	'ASUS',	'laptop-Asus',	NULL,	NULL,	1006,	'2024-10-21 08:47:55.746954',	'2024-10-21 08:47:55.746954',	1),
+(3,	'ACER',	'laptop-Acer',	NULL,	NULL,	1003,	'2024-10-21 08:59:07.745709',	'2024-10-21 08:59:07.745709',	1),
+(6,	'LENOVO',	'laptop-gaming-lenovo',	NULL,	NULL,	1008,	'2024-10-21 09:03:21.925657',	'2024-10-21 09:03:21.925657',	1),
+(4,	'ASUS/ROG',	'laptop-gaming-asus',	NULL,	NULL,	1007,	'2024-10-21 09:00:30.596952',	'2024-10-21 09:00:30.596952',	1),
+(5,	'DELL',	'laptop-dell',	NULL,	NULL,	1005,	'2024-10-21 09:08:11.706908',	'2024-10-21 09:08:11.706908',	1);
+
+DROP TABLE IF EXISTS "coupons";
+DROP SEQUENCE IF EXISTS coupons_id_seq;
+CREATE SEQUENCE coupons_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."coupons" (
+    "id" integer DEFAULT nextval('coupons_id_seq') NOT NULL,
+    "code" character varying(50) NOT NULL,
+    "discount_type" character varying(20) NOT NULL,
+    "discount_value" numeric(10,2) NOT NULL,
+    "start_date" date,
+    "end_date" date,
+    "min_purchase_amount" numeric(10,2),
+    "max_usage" integer,
+    "is_active" boolean DEFAULT true,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "coupons_code_key" UNIQUE ("code"),
+    CONSTRAINT "coupons_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_coupons_code" ON "public"."coupons" USING btree ("code");
+
+CREATE INDEX "idx_coupons_created_at" ON "public"."coupons" USING btree ("created_at");
+
+CREATE INDEX "idx_coupons_discount_type" ON "public"."coupons" USING btree ("discount_type");
+
+CREATE INDEX "idx_coupons_end_date" ON "public"."coupons" USING btree ("end_date");
+
+CREATE INDEX "idx_coupons_is_active" ON "public"."coupons" USING btree ("is_active");
+
+CREATE INDEX "idx_coupons_start_date" ON "public"."coupons" USING btree ("start_date");
+
+CREATE INDEX "idx_coupons_status" ON "public"."coupons" USING btree ("status");
+
+CREATE INDEX "idx_coupons_updated_at" ON "public"."coupons" USING btree ("updated_at");
+
+INSERT INTO "coupons" ("id", "code", "discount_type", "discount_value", "start_date", "end_date", "min_purchase_amount", "max_usage", "is_active", "created_at", "updated_at", "status") VALUES
+(1,	'COUPON1',	'percentage',	23.34,	'2024-11-15',	'2024-12-26',	93.57,	92,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(2,	'COUPON2',	'percentage',	48.57,	'2024-10-25',	'2024-12-18',	214.76,	28,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(3,	'COUPON3',	'fixed_amount',	89.10,	'2024-11-02',	'2024-12-20',	132.31,	20,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(4,	'COUPON4',	'fixed_amount',	94.96,	'2024-11-04',	'2025-01-28',	51.24,	86,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(5,	'COUPON5',	'percentage',	53.87,	'2024-10-25',	'2024-12-11',	92.51,	7,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(6,	'COUPON6',	'percentage',	36.59,	'2024-11-13',	'2025-02-03',	186.65,	96,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(7,	'COUPON7',	'fixed_amount',	31.60,	'2024-10-28',	'2025-01-03',	100.35,	79,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(8,	'COUPON8',	'fixed_amount',	32.32,	'2024-11-15',	'2025-01-22',	133.94,	11,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(9,	'COUPON9',	'fixed_amount',	47.23,	'2024-10-31',	'2025-01-03',	184.85,	91,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(10,	'COUPON10',	'percentage',	29.85,	'2024-11-19',	'2025-01-04',	123.01,	75,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(11,	'COUPON11',	'fixed_amount',	61.21,	'2024-11-06',	'2025-01-03',	85.19,	66,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(12,	'COUPON12',	'percentage',	27.28,	'2024-11-12',	'2025-01-20',	101.16,	7,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(13,	'COUPON13',	'percentage',	34.06,	'2024-11-04',	'2024-12-29',	60.12,	45,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(14,	'COUPON14',	'percentage',	6.10,	'2024-11-07',	'2025-01-13',	160.76,	7,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(15,	'COUPON15',	'percentage',	35.56,	'2024-10-23',	'2024-12-20',	176.31,	50,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(16,	'COUPON16',	'fixed_amount',	87.04,	'2024-11-01',	'2024-12-07',	190.17,	48,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(17,	'COUPON17',	'fixed_amount',	82.03,	'2024-11-16',	'2025-02-05',	166.07,	55,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(18,	'COUPON18',	'percentage',	38.50,	'2024-11-07',	'2025-01-09',	74.95,	57,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(19,	'COUPON19',	'fixed_amount',	76.22,	'2024-10-22',	'2024-12-22',	242.39,	71,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(20,	'COUPON20',	'percentage',	5.17,	'2024-10-28',	'2025-01-17',	196.58,	52,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(21,	'COUPON21',	'fixed_amount',	94.83,	'2024-11-17',	'2025-02-14',	206.57,	26,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(22,	'COUPON22',	'fixed_amount',	49.47,	'2024-10-30',	'2024-12-06',	119.06,	46,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(23,	'COUPON23',	'percentage',	17.13,	'2024-11-08',	'2025-01-21',	145.49,	29,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(24,	'COUPON24',	'percentage',	24.16,	'2024-11-13',	'2024-12-23',	75.92,	52,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(25,	'COUPON25',	'fixed_amount',	74.80,	'2024-11-12',	'2025-01-30',	200.53,	84,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(26,	'COUPON26',	'percentage',	23.61,	'2024-10-22',	'2024-12-16',	98.06,	56,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(27,	'COUPON27',	'fixed_amount',	21.11,	'2024-11-13',	'2025-01-30',	207.60,	30,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(28,	'COUPON28',	'fixed_amount',	66.54,	'2024-10-25',	'2024-12-07',	206.90,	28,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(29,	'COUPON29',	'fixed_amount',	28.69,	'2024-11-11',	'2025-01-18',	109.39,	64,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(30,	'COUPON30',	'percentage',	31.71,	'2024-11-14',	'2025-02-11',	58.07,	45,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(31,	'COUPON31',	'fixed_amount',	97.91,	'2024-11-08',	'2025-01-04',	179.97,	10,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(32,	'COUPON32',	'percentage',	29.06,	'2024-11-14',	'2025-01-18',	201.48,	61,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(33,	'COUPON33',	'percentage',	19.26,	'2024-11-15',	'2024-12-22',	174.84,	57,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(34,	'COUPON34',	'percentage',	36.50,	'2024-11-20',	'2025-01-25',	240.08,	70,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(35,	'COUPON35',	'fixed_amount',	53.23,	'2024-10-29',	'2025-01-06',	121.13,	10,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(36,	'COUPON36',	'percentage',	41.20,	'2024-11-17',	'2025-02-11',	57.28,	35,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(37,	'COUPON37',	'percentage',	49.56,	'2024-10-28',	'2025-01-12',	135.57,	36,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(38,	'COUPON38',	'fixed_amount',	57.49,	'2024-10-25',	'2024-12-23',	152.15,	24,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(39,	'COUPON39',	'fixed_amount',	56.60,	'2024-10-24',	'2024-11-29',	139.13,	33,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(40,	'COUPON40',	'percentage',	21.37,	'2024-10-24',	'2025-01-12',	201.94,	60,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(41,	'COUPON41',	'fixed_amount',	42.29,	'2024-11-18',	'2025-01-09',	213.40,	22,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(42,	'COUPON42',	'percentage',	44.96,	'2024-11-07',	'2025-02-02',	165.80,	96,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(43,	'COUPON43',	'percentage',	11.77,	'2024-11-11',	'2025-02-02',	96.44,	12,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(44,	'COUPON44',	'fixed_amount',	46.91,	'2024-11-03',	'2024-12-16',	176.82,	27,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(45,	'COUPON45',	'fixed_amount',	39.04,	'2024-11-20',	'2025-01-08',	174.11,	59,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(46,	'COUPON46',	'percentage',	41.61,	'2024-10-27',	'2024-12-06',	136.80,	52,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(47,	'COUPON47',	'fixed_amount',	65.19,	'2024-11-03',	'2025-01-03',	113.16,	93,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(48,	'COUPON48',	'fixed_amount',	83.75,	'2024-11-16',	'2025-02-06',	149.20,	7,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(49,	'COUPON49',	'percentage',	18.24,	'2024-10-26',	'2024-12-31',	77.08,	16,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1),
+(50,	'COUPON50',	'fixed_amount',	50.17,	'2024-10-30',	'2025-01-12',	189.09,	11,	't',	'2024-10-22 04:12:25.803038',	'2024-10-22 04:12:25.803038',	1);
+
+DROP TABLE IF EXISTS "images";
+DROP SEQUENCE IF EXISTS images_id_seq;
+CREATE SEQUENCE images_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."images" (
+    "id" integer DEFAULT nextval('images_id_seq') NOT NULL,
+    "url" character varying(255) DEFAULT 'https://picsum.photos/2000/2000?random=12' NOT NULL,
+    "alt_text" character varying(255),
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "images_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_images_created_at" ON "public"."images" USING btree ("created_at");
+
+CREATE INDEX "idx_images_status" ON "public"."images" USING btree ("status");
+
+CREATE INDEX "idx_images_updated_at" ON "public"."images" USING btree ("updated_at");
+
+CREATE INDEX "idx_images_url" ON "public"."images" USING btree ("url");
+
+INSERT INTO "images" ("id", "url", "alt_text", "created_at", "updated_at", "status") VALUES
+(101,	'https://product.hstatic.net/200000722513/product/ava_1c68829547de49f0acd0cf4cf7cb9da3_medium.png',	NULL,	'2024-10-21 06:50:32.319633',	'2024-10-21 06:50:32.319633',	1),
+(102,	'https://product.hstatic.net/200000722513/product/ava_11036b32e9e44271bf11e9597d394e4c_medium.png',	NULL,	'2024-10-21 06:50:43.929588',	'2024-10-21 06:50:43.929588',	1),
+(103,	'https://product.hstatic.net/200000722513/product/ava_810a00b3d74848829bbe8a18491c43fd_medium.png',	NULL,	'2024-10-21 06:50:56.332959',	'2024-10-21 06:50:56.332959',	1),
+(104,	'https://product.hstatic.net/200000722513/product/ava_0ac2d4e1b9eb4e62aa9e1b6421ed60ea_medium.png',	NULL,	'2024-10-21 06:51:03.019106',	'2024-10-21 06:51:03.019106',	1),
+(105,	'https://product.hstatic.net/200000722513/product/ava_8236b3b0602640c48f4a922e1a7dd7f1_medium.png',	NULL,	'2024-10-21 06:51:11.933639',	'2024-10-21 06:51:11.933639',	1),
+(106,	'https://product.hstatic.net/200000722513/product/ava_6b676d21eb834248bad1ccb4a2085909_medium.png',	NULL,	'2024-10-21 06:51:20.160065',	'2024-10-21 06:51:20.160065',	1),
+(107,	'https://product.hstatic.net/200000722513/product/ava_8b79b847df7643ef8a5fe9f64808c174_medium.png',	NULL,	'2024-10-21 06:51:28.822072',	'2024-10-21 06:51:28.822072',	1),
+(108,	'https://product.hstatic.net/200000722513/product/ava_e2cf6465de1f4151b18980628c7395e8_medium.png',	NULL,	'2024-10-21 06:51:36.85136',	'2024-10-21 06:51:36.85136',	1),
+(109,	'https://product.hstatic.net/200000722513/product/ava_979c41b2a83a4ad6939fd1f3f2d3fbd6_medium.png',	NULL,	'2024-10-21 06:51:46.485514',	'2024-10-21 06:51:46.485514',	1),
+(110,	'https://product.hstatic.net/200000722513/product/ava_178f7af8eb4948eea36257f2e488acfe_medium.png',	NULL,	'2024-10-21 06:51:55.705895',	'2024-10-21 06:51:55.705895',	1),
+(111,	'https://product.hstatic.net/200000722513/product/yoga_book_9_13imu9_ct1_05_73b72fdbfdf643cda3d2692c7ff601ef_medium.png',	NULL,	'2024-10-21 06:52:13.106099',	'2024-10-21 06:52:13.106099',	1),
+(112,	'https://product.hstatic.net/200000722513/product/ava_9894017cfc3c462994377fe99d697c21_medium.png',	NULL,	'2024-10-21 06:52:19.289569',	'2024-10-21 06:52:19.289569',	1),
+(113,	'https://product.hstatic.net/200000722513/product/gearvn-laptop-lenovo-ideapad-slim-5-14imh9-83da001nvn-10_63f5db80f6b34bd6a5e076e3083aae79_medium.png',	NULL,	'2024-10-21 06:52:24.721907',	'2024-10-21 06:52:24.721907',	1),
+(114,	'https://product.hstatic.net/200000722513/product/gearvn-laptop-lenovo-ideapad-flex-5-14alc7-82r900edvn-1_88e89ea07d4e4e529a3590b3deeada78_medium.png',	NULL,	'2024-10-21 06:52:34.457538',	'2024-10-21 06:52:34.457538',	1),
+(115,	'https://product.hstatic.net/200000722513/product/21e300e3vn_033caa0eb07346b48bdebf32df4ef51d_medium.png',	NULL,	'2024-10-21 06:52:42.25327',	'2024-10-21 06:52:42.25327',	1),
+(116,	'https://product.hstatic.net/200000722513/product/83e0000vvn_0cbbc710f4eb438da416b93876a159cc_medium.png',	NULL,	'2024-10-21 06:52:47.892347',	'2024-10-21 06:52:47.892347',	1),
+(117,	'https://product.hstatic.net/200000722513/product/asus_gaming_vivobook_k3605zf-rp634w_d59d42a7451f48d48cce32645f03f90c_medium.jpg',	NULL,	'2024-10-21 07:42:29.640427',	'2024-10-21 07:42:29.640427',	1),
+(118,	'https://product.hstatic.net/200000722513/product/asus_gaming_vivobook_k3605zu-rp296w_new_1_49eb90c1052842bab297ef6be3054255_medium.jpg',	NULL,	'2024-10-21 07:42:34.836285',	'2024-10-21 07:42:34.836285',	1),
+(119,	'https://product.hstatic.net/200000722513/product/asus_gaming_vivobook_k3605zc-rp564w_ea2d64835b1f48d0b871a334e40c05d5_medium.jpg',	NULL,	'2024-10-21 07:42:40.504414',	'2024-10-21 07:42:40.504414',	1),
+(120,	'https://product.hstatic.net/200000722513/product/ava_cc377fa319f54e5884151ee493e0f2c1_medium.png',	NULL,	'2024-10-21 07:42:46.337847',	'2024-10-21 07:42:46.337847',	1),
+(121,	'https://product.hstatic.net/200000722513/product/ava_85f0a13f59c24412a311436fd2b3efc7_medium.png',	NULL,	'2024-10-21 07:42:52.453664',	'2024-10-21 07:42:52.453664',	1),
+(122,	'https://product.hstatic.net/200000722513/product/ux3405ma-pp588w_zenbook_ai_b097c88019d44a789e70d8fa49fc91ef_medium.jpg',	NULL,	'2024-10-21 07:42:57.242231',	'2024-10-21 07:42:57.242231',	1),
+(123,	'https://product.hstatic.net/200000722513/product/ux3405ma-pp151w_zenbook_ai_f61c0a3d9e6b45879ccc0213653fc56b_medium.jpg',	NULL,	'2024-10-21 07:43:02.474565',	'2024-10-21 07:43:02.474565',	1),
+(124,	'https://product.hstatic.net/200000722513/product/7_27_a3f6dfa7a8854d958953ad81268880d2_medium.png',	NULL,	'2024-10-21 07:43:07.344306',	'2024-10-21 07:43:07.344306',	1),
+(125,	'https://product.hstatic.net/200000722513/product/ux8406ma-pz142w_new_1_323777fbd2ea4f788f45c1165ed81427_medium.jpg',	NULL,	'2024-10-21 07:43:12.298001',	'2024-10-21 07:43:12.298001',	1),
+(126,	'https://product.hstatic.net/200000722513/product/ux3402_a2619c42064844baa32f829f9ca427bf_large_3438f2f4a5db4ac89aeef5cd001564e1_medium.gif',	NULL,	'2024-10-21 07:43:20.774904',	'2024-10-21 07:43:20.774904',	1),
+(127,	'https://product.hstatic.net/200000722513/product/km203w_344a750d654a45099b3da33db79ac173_medium.png',	NULL,	'2024-10-21 07:43:26.642386',	'2024-10-21 07:43:26.642386',	1),
+(128,	'https://product.hstatic.net/200000722513/product/ava_2f4cb5c51e4640449bf838e9ccdf6f4e_medium.png',	NULL,	'2024-10-21 07:43:49.305315',	'2024-10-21 07:43:49.305315',	1),
+(129,	'https://product.hstatic.net/200000722513/product/wift-go-ai-2024-gen-2-sfg14-73-71zx_1_ccc2cc55cf11451086e09eac92cae064_ed8a6356d9374b53a4c13abaea1658a8_medium.png',	NULL,	'2024-10-21 07:43:54.271338',	'2024-10-21 07:43:54.271338',	1),
+(130,	'https://product.hstatic.net/200000722513/product/ava_23fd058fa70a49d3820477678e2e8a49_medium.png',	NULL,	'2024-10-21 07:44:01.383392',	'2024-10-21 07:44:01.383392',	1),
+(131,	'https://product.hstatic.net/200000722513/product/ava_f4961f3432f84674b7d37c5fbeb3aa17_medium.png',	NULL,	'2024-10-21 07:44:22.306139',	'2024-10-21 07:44:22.306139',	1),
+(132,	'https://product.hstatic.net/200000722513/product/ava_7a60a95da9ad4f79937195617962b252_medium.png',	NULL,	'2024-10-21 07:44:39.097629',	'2024-10-21 07:44:39.097629',	1),
+(133,	'https://product.hstatic.net/200000722513/product/ava_b6f0624cda48402da828d7f326c8dcd2_medium.png',	NULL,	'2024-10-21 07:44:44.673833',	'2024-10-21 07:44:44.673833',	1),
+(134,	'https://product.hstatic.net/200000722513/product/71013325_4eac8f60cf2d4908b5a1a98ca2412cc0_eb48cfe4200b469aa293606fbbe67160_medium.png',	NULL,	'2024-10-21 07:44:49.624701',	'2024-10-21 07:44:49.624701',	1),
+(135,	'https://product.hstatic.net/200000722513/product/dell_3f2b91da99f7492ab27a0850bf13ccc5_medium.png',	NULL,	'2024-10-21 07:44:56.409493',	'2024-10-21 07:44:56.409493',	1),
+(136,	'https://product.hstatic.net/200000722513/product/inspiron-15-3530-i5u085w11blu_b60d09f21993480cadda384a5fe9c154_medium.png',	NULL,	'2024-10-21 07:45:02.681409',	'2024-10-21 07:45:02.681409',	1),
+(137,	'https://product.hstatic.net/200000722513/product/71003262_808df7fb9700440491a3d533c64459a9_73bd092b189847fab89a14f8e369fa91_medium.png',	NULL,	'2024-10-21 07:45:07.671848',	'2024-10-21 07:45:07.671848',	1),
+(138,	'https://product.hstatic.net/200000722513/product/05a3b4354b5a27555f4510780_large_19db3dd766fa42f1983f345b05bf6887_large_b12e91a08927490d9905ca9ea507ce62_medium.png',	NULL,	'2024-10-21 07:45:23.244447',	'2024-10-21 07:45:23.244447',	1),
+(139,	'https://product.hstatic.net/200000722513/product/ava_5cf8182eaaa84d0bb59110b4bd55f03a_medium.png',	NULL,	'2024-10-21 07:45:28.664825',	'2024-10-21 07:45:28.664825',	1),
+(140,	'https://product.hstatic.net/200000722513/product/nitro-v_755588bd95514b6386940d73d3951e2d_1024x1024_bc0b12132d4042eab8a07af909096236_medium.png',	NULL,	'2024-10-21 07:45:39.847626',	'2024-10-21 07:45:39.847626',	1),
+(141,	'https://product.hstatic.net/200000722513/product/ava_18bc3b476d5240a89aaca071e755ced4_medium.png',	NULL,	'2024-10-21 07:49:28.943309',	'2024-10-21 07:49:28.943309',	1),
+(142,	'https://product.hstatic.net/200000722513/product/ava_48704ef5ed9248ccb2455b916a67b5c8_medium.png',	NULL,	'2024-10-21 07:49:34.092745',	'2024-10-21 07:49:34.092745',	1),
+(143,	'https://product.hstatic.net/200000722513/product/ava_dea980b662854ab8a4dd359d3bd8d2b4_medium.png',	NULL,	'2024-10-21 07:49:38.041113',	'2024-10-21 07:49:38.041113',	1),
+(144,	'https://product.hstatic.net/200000722513/product/ava1_fa4a852e3b5b40978022459ce8d8562a_medium.png',	NULL,	'2024-10-21 07:49:42.692769',	'2024-10-21 07:49:42.692769',	1),
+(145,	'https://product.hstatic.net/200000722513/product/ava_d2da11ba2af941a8972ea4d4ddaf8159_medium.png',	NULL,	'2024-10-21 07:49:46.798661',	'2024-10-21 07:49:46.798661',	1),
+(146,	'https://product.hstatic.net/200000722513/product/ava_3ec51dab2408464e87ea3dfe4a333f0e_medium.png',	NULL,	'2024-10-21 07:49:55.200032',	'2024-10-21 07:49:55.200032',	1),
+(147,	'https://product.hstatic.net/200000722513/product/h732__6__d07e728e8eeb447d9dcb345b64bafac2_medium.png',	NULL,	'2024-10-21 07:50:01.123137',	'2024-10-21 07:50:01.123137',	1),
+(148,	'https://product.hstatic.net/200000722513/product/ava_583e7ddd56f14a1db611875e7c7bc764_medium.png',	NULL,	'2024-10-21 07:50:07.428797',	'2024-10-21 07:50:07.428797',	1),
+(1006,	'https://inkythuatso.com/uploads/thumbnails/800/2021/11/logo-asus-inkythuatso-2-01-26-09-21-11.jpg',	NULL,	'2024-10-21 08:38:08.376751',	'2024-10-21 08:38:08.376751',	1),
+(1004,	'https://w1.pngwing.com/pngs/935/964/png-transparent-circle-logo-hp-pavilion-dv6-printer-hp-deskjet-laptop-organization-hp-indigo-division-hp-laserjet-thumbnail.png',	NULL,	'2024-10-21 08:38:54.427062',	'2024-10-21 08:38:54.427062',	1),
+(1003,	'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0JX6eQOU_FRLhTl_iyqYVD7wL_DG7McT6GQ&s',	NULL,	'2024-10-21 08:40:34.265472',	'2024-10-21 08:40:34.265472',	1),
+(1007,	'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe6SNEuMy9I5tYJS0mcAQhG4avS2kZRna-5A&s',	NULL,	'2024-10-21 08:46:49.283737',	'2024-10-21 08:46:49.283737',	1),
+(1005,	'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR06Ps6s6u8Rdb3zNsg-MHT2TtSOnFks50xEA&s',	NULL,	'2024-10-21 08:36:21.561378',	'2024-10-21 09:04:32.722604',	1),
+(1008,	'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWxQmO94XjMp2yw4gxlbkdH2MizVlnSRYbWQ&s',	NULL,	'2024-10-21 08:45:14.751593',	'2024-10-22 06:28:09.095981',	1);
+
+DELIMITER ;;
+
+CREATE TRIGGER "update_images_modtime" BEFORE UPDATE ON "public"."images" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
+
+DELIMITER ;
+
+DROP TABLE IF EXISTS "order_items";
+DROP SEQUENCE IF EXISTS order_items_id_seq;
+CREATE SEQUENCE order_items_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."order_items" (
+    "id" integer DEFAULT nextval('order_items_id_seq') NOT NULL,
+    "order_id" integer,
+    "product_id" integer,
+    "quantity" integer NOT NULL,
+    "price" numeric(10,2) NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "order_items_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_order_items_created_at" ON "public"."order_items" USING btree ("created_at");
+
+CREATE INDEX "idx_order_items_order_id" ON "public"."order_items" USING btree ("order_id");
+
+CREATE INDEX "idx_order_items_product_id" ON "public"."order_items" USING btree ("product_id");
+
+CREATE INDEX "idx_order_items_status" ON "public"."order_items" USING btree ("status");
+
+CREATE INDEX "idx_order_items_updated_at" ON "public"."order_items" USING btree ("updated_at");
+
+
+DROP TABLE IF EXISTS "orders";
+DROP SEQUENCE IF EXISTS orders_id_seq;
+CREATE SEQUENCE orders_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."orders" (
+    "id" integer DEFAULT nextval('orders_id_seq') NOT NULL,
+    "user_id" integer,
+    "order_date" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "total_amount" numeric(10,2) NOT NULL,
+    "shipping_address" text,
+    "payment_method" character varying(50),
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "orders_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_orders_created_at" ON "public"."orders" USING btree ("created_at");
+
+CREATE INDEX "idx_orders_order_date" ON "public"."orders" USING btree ("order_date");
+
+CREATE INDEX "idx_orders_status" ON "public"."orders" USING btree ("status");
+
+CREATE INDEX "idx_orders_total_amount" ON "public"."orders" USING btree ("total_amount");
+
+CREATE INDEX "idx_orders_updated_at" ON "public"."orders" USING btree ("updated_at");
+
+CREATE INDEX "idx_orders_user_id" ON "public"."orders" USING btree ("user_id");
+
+INSERT INTO "orders" ("id", "user_id", "order_date", "total_amount", "shipping_address", "payment_method", "created_at", "updated_at", "status") VALUES
+(74,	NULL,	'2024-10-22 04:12:25.252277',	145.09,	'Shipping Address 74',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(65,	NULL,	'2024-10-22 04:12:25.252277',	106.30,	'Shipping Address 65',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(54,	NULL,	'2024-10-22 04:12:25.252277',	112.84,	'Shipping Address 54',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(72,	NULL,	'2024-10-22 04:12:25.252277',	610.93,	'Shipping Address 72',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(64,	NULL,	'2024-10-22 04:12:25.252277',	453.27,	'Shipping Address 64',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(61,	NULL,	'2024-10-22 04:12:25.252277',	646.35,	'Shipping Address 61',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(58,	NULL,	'2024-10-22 04:12:25.252277',	24.50,	'Shipping Address 58',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(55,	NULL,	'2024-10-22 04:12:25.252277',	868.32,	'Shipping Address 55',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(62,	NULL,	'2024-10-22 04:12:25.252277',	715.96,	'Shipping Address 62',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(71,	NULL,	'2024-10-22 04:12:25.252277',	114.73,	'Shipping Address 71',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(53,	NULL,	'2024-10-22 04:12:25.252277',	613.70,	'Shipping Address 53',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(56,	NULL,	'2024-10-22 04:12:25.252277',	286.75,	'Shipping Address 56',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(51,	NULL,	'2024-10-22 04:12:25.252277',	675.48,	'Shipping Address 51',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(73,	NULL,	'2024-10-22 04:12:25.252277',	744.47,	'Shipping Address 73',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(66,	NULL,	'2024-10-22 04:12:25.252277',	739.21,	'Shipping Address 66',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(59,	NULL,	'2024-10-22 04:12:25.252277',	775.07,	'Shipping Address 59',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(63,	NULL,	'2024-10-22 04:12:25.252277',	510.54,	'Shipping Address 63',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(57,	NULL,	'2024-10-22 04:12:25.252277',	878.01,	'Shipping Address 57',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(68,	NULL,	'2024-10-22 04:12:25.252277',	763.13,	'Shipping Address 68',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(69,	NULL,	'2024-10-22 04:12:25.252277',	196.07,	'Shipping Address 69',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(67,	NULL,	'2024-10-22 04:12:25.252277',	938.01,	'Shipping Address 67',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(52,	NULL,	'2024-10-22 04:12:25.252277',	198.18,	'Shipping Address 52',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(60,	NULL,	'2024-10-22 04:12:25.252277',	21.72,	'Shipping Address 60',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(70,	NULL,	'2024-10-22 04:12:25.252277',	743.67,	'Shipping Address 70',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(100,	NULL,	'2024-10-22 04:12:25.252277',	898.95,	'Shipping Address 100',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(106,	NULL,	'2024-10-22 04:12:25.252277',	625.41,	'Shipping Address 106',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(114,	NULL,	'2024-10-22 04:12:25.252277',	630.58,	'Shipping Address 114',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(92,	NULL,	'2024-10-22 04:12:25.252277',	45.56,	'Shipping Address 92',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(96,	NULL,	'2024-10-22 04:12:25.252277',	411.88,	'Shipping Address 96',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(131,	NULL,	'2024-10-22 04:12:25.252277',	148.18,	'Shipping Address 131',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(188,	NULL,	'2024-10-22 04:12:25.252277',	426.77,	'Shipping Address 188',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(83,	NULL,	'2024-10-22 04:12:25.252277',	568.02,	'Shipping Address 83',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(107,	NULL,	'2024-10-22 04:12:25.252277',	908.73,	'Shipping Address 107',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(185,	NULL,	'2024-10-22 04:12:25.252277',	602.09,	'Shipping Address 185',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(76,	NULL,	'2024-10-22 04:12:25.252277',	69.62,	'Shipping Address 76',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(176,	NULL,	'2024-10-22 04:12:25.252277',	477.02,	'Shipping Address 176',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(78,	NULL,	'2024-10-22 04:12:25.252277',	247.53,	'Shipping Address 78',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(112,	NULL,	'2024-10-22 04:12:25.252277',	310.25,	'Shipping Address 112',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(90,	NULL,	'2024-10-22 04:12:25.252277',	313.78,	'Shipping Address 90',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(144,	NULL,	'2024-10-22 04:12:25.252277',	267.23,	'Shipping Address 144',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(180,	NULL,	'2024-10-22 04:12:25.252277',	74.57,	'Shipping Address 180',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(195,	NULL,	'2024-10-22 04:12:25.252277',	959.46,	'Shipping Address 195',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(198,	NULL,	'2024-10-22 04:12:25.252277',	526.98,	'Shipping Address 198',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(103,	NULL,	'2024-10-22 04:12:25.252277',	494.07,	'Shipping Address 103',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(157,	NULL,	'2024-10-22 04:12:25.252277',	704.36,	'Shipping Address 157',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(182,	NULL,	'2024-10-22 04:12:25.252277',	169.19,	'Shipping Address 182',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(87,	NULL,	'2024-10-22 04:12:25.252277',	676.46,	'Shipping Address 87',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(150,	NULL,	'2024-10-22 04:12:25.252277',	922.20,	'Shipping Address 150',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(167,	NULL,	'2024-10-22 04:12:25.252277',	339.44,	'Shipping Address 167',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(118,	NULL,	'2024-10-22 04:12:25.252277',	704.53,	'Shipping Address 118',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(169,	NULL,	'2024-10-22 04:12:25.252277',	882.01,	'Shipping Address 169',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(81,	NULL,	'2024-10-22 04:12:25.252277',	710.76,	'Shipping Address 81',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(123,	NULL,	'2024-10-22 04:12:25.252277',	39.70,	'Shipping Address 123',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(166,	NULL,	'2024-10-22 04:12:25.252277',	715.83,	'Shipping Address 166',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(97,	NULL,	'2024-10-22 04:12:25.252277',	901.91,	'Shipping Address 97',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(191,	NULL,	'2024-10-22 04:12:25.252277',	501.44,	'Shipping Address 191',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(161,	NULL,	'2024-10-22 04:12:25.252277',	100.49,	'Shipping Address 161',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(138,	NULL,	'2024-10-22 04:12:25.252277',	290.65,	'Shipping Address 138',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(79,	NULL,	'2024-10-22 04:12:25.252277',	770.42,	'Shipping Address 79',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(95,	NULL,	'2024-10-22 04:12:25.252277',	261.65,	'Shipping Address 95',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(93,	NULL,	'2024-10-22 04:12:25.252277',	761.56,	'Shipping Address 93',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(196,	NULL,	'2024-10-22 04:12:25.252277',	464.72,	'Shipping Address 196',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(130,	NULL,	'2024-10-22 04:12:25.252277',	875.24,	'Shipping Address 130',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(84,	NULL,	'2024-10-22 04:12:25.252277',	128.31,	'Shipping Address 84',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(113,	NULL,	'2024-10-22 04:12:25.252277',	581.97,	'Shipping Address 113',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(160,	NULL,	'2024-10-22 04:12:25.252277',	287.71,	'Shipping Address 160',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(197,	NULL,	'2024-10-22 04:12:25.252277',	998.56,	'Shipping Address 197',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(121,	NULL,	'2024-10-22 04:12:25.252277',	65.62,	'Shipping Address 121',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(186,	NULL,	'2024-10-22 04:12:25.252277',	664.25,	'Shipping Address 186',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(82,	NULL,	'2024-10-22 04:12:25.252277',	190.96,	'Shipping Address 82',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(115,	NULL,	'2024-10-22 04:12:25.252277',	67.50,	'Shipping Address 115',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(181,	NULL,	'2024-10-22 04:12:25.252277',	833.56,	'Shipping Address 181',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(172,	NULL,	'2024-10-22 04:12:25.252277',	37.07,	'Shipping Address 172',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(193,	NULL,	'2024-10-22 04:12:25.252277',	20.12,	'Shipping Address 193',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(137,	NULL,	'2024-10-22 04:12:25.252277',	139.45,	'Shipping Address 137',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(175,	NULL,	'2024-10-22 04:12:25.252277',	273.66,	'Shipping Address 175',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(187,	NULL,	'2024-10-22 04:12:25.252277',	908.32,	'Shipping Address 187',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(143,	NULL,	'2024-10-22 04:12:25.252277',	643.55,	'Shipping Address 143',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(148,	NULL,	'2024-10-22 04:12:25.252277',	436.53,	'Shipping Address 148',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(177,	NULL,	'2024-10-22 04:12:25.252277',	354.35,	'Shipping Address 177',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(189,	NULL,	'2024-10-22 04:12:25.252277',	112.01,	'Shipping Address 189',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(117,	NULL,	'2024-10-22 04:12:25.252277',	887.84,	'Shipping Address 117',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(128,	NULL,	'2024-10-22 04:12:25.252277',	983.62,	'Shipping Address 128',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(159,	NULL,	'2024-10-22 04:12:25.252277',	339.97,	'Shipping Address 159',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(183,	NULL,	'2024-10-22 04:12:25.252277',	475.87,	'Shipping Address 183',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(99,	NULL,	'2024-10-22 04:12:25.252277',	671.72,	'Shipping Address 99',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(199,	NULL,	'2024-10-22 04:12:25.252277',	585.34,	'Shipping Address 199',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(85,	NULL,	'2024-10-22 04:12:25.252277',	529.99,	'Shipping Address 85',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(170,	NULL,	'2024-10-22 04:12:25.252277',	485.04,	'Shipping Address 170',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(124,	NULL,	'2024-10-22 04:12:25.252277',	707.03,	'Shipping Address 124',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(142,	NULL,	'2024-10-22 04:12:25.252277',	313.36,	'Shipping Address 142',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(153,	NULL,	'2024-10-22 04:12:25.252277',	549.01,	'Shipping Address 153',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(86,	NULL,	'2024-10-22 04:12:25.252277',	742.54,	'Shipping Address 86',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(104,	NULL,	'2024-10-22 04:12:25.252277',	108.43,	'Shipping Address 104',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(184,	NULL,	'2024-10-22 04:12:25.252277',	903.83,	'Shipping Address 184',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(101,	NULL,	'2024-10-22 04:12:25.252277',	152.38,	'Shipping Address 101',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(174,	NULL,	'2024-10-22 04:12:25.252277',	83.96,	'Shipping Address 174',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(179,	NULL,	'2024-10-22 04:12:25.252277',	948.93,	'Shipping Address 179',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(173,	NULL,	'2024-10-22 04:12:25.252277',	302.53,	'Shipping Address 173',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(200,	NULL,	'2024-10-22 04:12:25.252277',	64.06,	'Shipping Address 200',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(165,	NULL,	'2024-10-22 04:12:25.252277',	694.94,	'Shipping Address 165',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(140,	NULL,	'2024-10-22 04:12:25.252277',	310.91,	'Shipping Address 140',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(147,	NULL,	'2024-10-22 04:12:25.252277',	200.30,	'Shipping Address 147',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(145,	NULL,	'2024-10-22 04:12:25.252277',	427.14,	'Shipping Address 145',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(151,	NULL,	'2024-10-22 04:12:25.252277',	223.47,	'Shipping Address 151',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(163,	NULL,	'2024-10-22 04:12:25.252277',	680.52,	'Shipping Address 163',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(154,	NULL,	'2024-10-22 04:12:25.252277',	364.72,	'Shipping Address 154',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(162,	NULL,	'2024-10-22 04:12:25.252277',	618.58,	'Shipping Address 162',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(91,	NULL,	'2024-10-22 04:12:25.252277',	179.34,	'Shipping Address 91',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(127,	NULL,	'2024-10-22 04:12:25.252277',	361.45,	'Shipping Address 127',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(135,	NULL,	'2024-10-22 04:12:25.252277',	845.32,	'Shipping Address 135',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(116,	NULL,	'2024-10-22 04:12:25.252277',	320.31,	'Shipping Address 116',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(120,	NULL,	'2024-10-22 04:12:25.252277',	655.63,	'Shipping Address 120',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(126,	NULL,	'2024-10-22 04:12:25.252277',	753.40,	'Shipping Address 126',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(77,	NULL,	'2024-10-22 04:12:25.252277',	861.92,	'Shipping Address 77',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(149,	NULL,	'2024-10-22 04:12:25.252277',	571.90,	'Shipping Address 149',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(98,	NULL,	'2024-10-22 04:12:25.252277',	592.32,	'Shipping Address 98',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(125,	NULL,	'2024-10-22 04:12:25.252277',	969.91,	'Shipping Address 125',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(136,	NULL,	'2024-10-22 04:12:25.252277',	810.06,	'Shipping Address 136',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(80,	NULL,	'2024-10-22 04:12:25.252277',	156.54,	'Shipping Address 80',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(132,	NULL,	'2024-10-22 04:12:25.252277',	917.59,	'Shipping Address 132',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(109,	NULL,	'2024-10-22 04:12:25.252277',	752.66,	'Shipping Address 109',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(122,	NULL,	'2024-10-22 04:12:25.252277',	509.34,	'Shipping Address 122',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(88,	NULL,	'2024-10-22 04:12:25.252277',	87.21,	'Shipping Address 88',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(168,	NULL,	'2024-10-22 04:12:25.252277',	568.36,	'Shipping Address 168',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(89,	NULL,	'2024-10-22 04:12:25.252277',	1005.53,	'Shipping Address 89',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(146,	NULL,	'2024-10-22 04:12:25.252277',	208.44,	'Shipping Address 146',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(119,	NULL,	'2024-10-22 04:12:25.252277',	115.67,	'Shipping Address 119',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(171,	NULL,	'2024-10-22 04:12:25.252277',	596.99,	'Shipping Address 171',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(129,	NULL,	'2024-10-22 04:12:25.252277',	383.39,	'Shipping Address 129',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(192,	NULL,	'2024-10-22 04:12:25.252277',	512.03,	'Shipping Address 192',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(134,	NULL,	'2024-10-22 04:12:25.252277',	424.02,	'Shipping Address 134',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(152,	NULL,	'2024-10-22 04:12:25.252277',	440.81,	'Shipping Address 152',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(156,	NULL,	'2024-10-22 04:12:25.252277',	435.83,	'Shipping Address 156',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(141,	NULL,	'2024-10-22 04:12:25.252277',	825.60,	'Shipping Address 141',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(108,	NULL,	'2024-10-22 04:12:25.252277',	520.61,	'Shipping Address 108',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(139,	NULL,	'2024-10-22 04:12:25.252277',	956.73,	'Shipping Address 139',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(155,	NULL,	'2024-10-22 04:12:25.252277',	112.86,	'Shipping Address 155',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(105,	NULL,	'2024-10-22 04:12:25.252277',	246.06,	'Shipping Address 105',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(75,	NULL,	'2024-10-22 04:12:25.252277',	675.24,	'Shipping Address 75',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(194,	NULL,	'2024-10-22 04:12:25.252277',	459.65,	'Shipping Address 194',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(94,	NULL,	'2024-10-22 04:12:25.252277',	669.05,	'Shipping Address 94',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(110,	NULL,	'2024-10-22 04:12:25.252277',	963.39,	'Shipping Address 110',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(190,	NULL,	'2024-10-22 04:12:25.252277',	39.18,	'Shipping Address 190',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(102,	NULL,	'2024-10-22 04:12:25.252277',	299.83,	'Shipping Address 102',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(164,	NULL,	'2024-10-22 04:12:25.252277',	584.87,	'Shipping Address 164',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(133,	NULL,	'2024-10-22 04:12:25.252277',	139.06,	'Shipping Address 133',	'Credit Card',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(178,	NULL,	'2024-10-22 04:12:25.252277',	857.28,	'Shipping Address 178',	'Bank Transfer',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(111,	NULL,	'2024-10-22 04:12:25.252277',	781.56,	'Shipping Address 111',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1),
+(158,	NULL,	'2024-10-22 04:12:25.252277',	68.69,	'Shipping Address 158',	'PayPal',	'2024-10-22 04:12:25.252277',	'2024-10-22 04:12:25.252277',	1);
+
+DROP TABLE IF EXISTS "permissions";
+DROP SEQUENCE IF EXISTS permissions_id_seq;
+CREATE SEQUENCE permissions_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."permissions" (
+    "id" integer DEFAULT nextval('permissions_id_seq') NOT NULL,
+    "name" character varying(50) NOT NULL,
+    "description" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "permissions_name_key" UNIQUE ("name"),
+    CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_permissions_created_at" ON "public"."permissions" USING btree ("created_at");
+
+CREATE INDEX "idx_permissions_name" ON "public"."permissions" USING btree ("name");
+
+CREATE INDEX "idx_permissions_status" ON "public"."permissions" USING btree ("status");
+
+CREATE INDEX "idx_permissions_updated_at" ON "public"."permissions" USING btree ("updated_at");
+
+
+DROP TABLE IF EXISTS "product_categories";
+CREATE TABLE "public"."product_categories" (
+    "product_id" integer NOT NULL,
+    "category_id" integer NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "product_categories_pkey" PRIMARY KEY ("product_id", "category_id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_product_categories_category_id" ON "public"."product_categories" USING btree ("category_id");
+
+CREATE INDEX "idx_product_categories_created_at" ON "public"."product_categories" USING btree ("created_at");
+
+CREATE INDEX "idx_product_categories_product_id" ON "public"."product_categories" USING btree ("product_id");
+
+CREATE INDEX "idx_product_categories_status" ON "public"."product_categories" USING btree ("status");
+
+CREATE INDEX "idx_product_categories_updated_at" ON "public"."product_categories" USING btree ("updated_at");
+
+INSERT INTO "product_categories" ("product_id", "category_id", "created_at", "updated_at", "status") VALUES
+(101,	6,	'2024-10-22 10:06:16.218677',	'2024-10-22 10:06:16.218677',	1),
+(102,	6,	'2024-10-22 10:06:40.687052',	'2024-10-22 10:06:40.687052',	1),
+(100,	4,	'2024-10-22 10:06:54.826312',	'2024-10-22 10:06:54.826312',	1);
+
+DROP TABLE IF EXISTS "product_images";
+DROP SEQUENCE IF EXISTS product_images_id_seq;
+CREATE SEQUENCE product_images_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."product_images" (
+    "id" integer DEFAULT nextval('product_images_id_seq') NOT NULL,
+    "product_id" integer,
+    "image_id" integer,
+    "display_order" integer,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "product_images_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_product_images_created_at" ON "public"."product_images" USING btree ("created_at");
+
+CREATE INDEX "idx_product_images_display_order" ON "public"."product_images" USING btree ("display_order");
+
+CREATE INDEX "idx_product_images_image_id" ON "public"."product_images" USING btree ("image_id");
+
+CREATE INDEX "idx_product_images_product_id" ON "public"."product_images" USING btree ("product_id");
+
+CREATE INDEX "idx_product_images_status" ON "public"."product_images" USING btree ("status");
+
+CREATE INDEX "idx_product_images_updated_at" ON "public"."product_images" USING btree ("updated_at");
+
+INSERT INTO "product_images" ("id", "product_id", "image_id", "display_order", "created_at", "updated_at", "status") VALUES
+(201,	100,	148,	NULL,	'2024-10-22 10:08:13.513035',	'2024-10-22 10:08:13.513035',	1),
+(202,	101,	113,	NULL,	'2024-10-22 10:08:32.206878',	'2024-10-22 10:08:32.206878',	1),
+(203,	102,	130,	NULL,	'2024-10-22 10:08:45.882162',	'2024-10-22 10:08:45.882162',	1);
+
+DROP TABLE IF EXISTS "product_specifications";
+DROP SEQUENCE IF EXISTS product_specifications_id_seq;
+CREATE SEQUENCE product_specifications_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."product_specifications" (
+    "id" integer DEFAULT nextval('product_specifications_id_seq') NOT NULL,
+    "product_id" integer NOT NULL,
+    "spec_name" character varying(100) NOT NULL,
+    "spec_value" text NOT NULL,
+    "unit" character varying(50),
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "product_specifications_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "product_specifications_product_id_spec_name_key" UNIQUE ("product_id", "spec_name")
+) WITH (oids = false);
+
+CREATE INDEX "idx_product_specifications_created_at" ON "public"."product_specifications" USING btree ("created_at");
+
+CREATE INDEX "idx_product_specifications_product_id" ON "public"."product_specifications" USING btree ("product_id");
+
+CREATE INDEX "idx_product_specifications_spec_name" ON "public"."product_specifications" USING btree ("spec_name");
+
+CREATE INDEX "idx_product_specifications_status" ON "public"."product_specifications" USING btree ("status");
+
+CREATE INDEX "idx_product_specifications_updated_at" ON "public"."product_specifications" USING btree ("updated_at");
+
+INSERT INTO "product_specifications" ("id", "product_id", "spec_name", "spec_value", "unit", "created_at", "updated_at", "status") VALUES
+(1,	100,	'CPU',	'Intel® Core™ i9-13900H',	NULL,	'2024-10-22 10:09:39.89165',	'2024-10-22 10:09:39.89165',	1),
+(2,	100,	'RAM',	'16GB',	'2',	'2024-10-22 10:10:09.635917',	'2024-10-22 10:10:09.635917',	1),
+(3,	100,	'Ổ Cứng',	'1TB PCIe® 4.0 NVMe™ M.2 SSD',	'1',	'2024-10-22 10:11:56.50813',	'2024-10-22 10:11:56.50813',	1),
+(4,	100,	'Màn Hình',	'16-inch QHD+',	NULL,	'2024-10-22 10:12:28.717371',	'2024-10-22 10:12:28.717371',	1),
+(5,	101,	'CPU',	'Intel® Core™ 5 120U',	NULL,	'2024-10-22 10:14:00.599888',	'2024-10-22 10:14:00.599888',	1),
+(6,	101,	'RAM',	'16GB ',	'1',	'2024-10-22 10:14:20.772786',	'2024-10-22 10:14:20.772786',	1),
+(7,	101,	'Ổ Cứng',	'512GB',	NULL,	'2024-10-22 10:14:37.77986',	'2024-10-22 10:14:37.77986',	1),
+(8,	101,	'Màn Hình',	'15.3inch WUXGA',	NULL,	'2024-10-22 10:15:01.977346',	'2024-10-22 10:15:01.977346',	1),
+(9,	102,	'CPU',	'Intel® Core™ Ultra 7 155U',	NULL,	'2024-10-22 10:15:40.775314',	'2024-10-22 10:15:40.775314',	1),
+(10,	102,	'RAM',	'32GB',	'1',	'2024-10-22 10:16:02.874807',	'2024-10-22 10:16:02.874807',	1),
+(11,	102,	'Màn Hình',	'14-inch OLED',	NULL,	'2024-10-22 10:16:26.331951',	'2024-10-22 10:16:26.331951',	1);
+
+DROP TABLE IF EXISTS "product_tags";
+CREATE TABLE "public"."product_tags" (
+    "product_id" integer NOT NULL,
+    "tag_id" integer NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "product_tags_pkey" PRIMARY KEY ("product_id", "tag_id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_product_tags_created_at" ON "public"."product_tags" USING btree ("created_at");
+
+CREATE INDEX "idx_product_tags_product_id" ON "public"."product_tags" USING btree ("product_id");
+
+CREATE INDEX "idx_product_tags_status" ON "public"."product_tags" USING btree ("status");
+
+CREATE INDEX "idx_product_tags_tag_id" ON "public"."product_tags" USING btree ("tag_id");
+
+CREATE INDEX "idx_product_tags_updated_at" ON "public"."product_tags" USING btree ("updated_at");
+
+INSERT INTO "product_tags" ("product_id", "tag_id", "created_at", "updated_at", "status") VALUES
+(100,	9,	'2024-10-22 10:17:32.147866',	'2024-10-22 10:17:32.147866',	1),
+(101,	3,	'2024-10-22 10:18:10.45774',	'2024-10-22 10:18:10.45774',	1),
+(102,	3,	'2024-10-22 10:18:16.599974',	'2024-10-22 10:18:16.599974',	1);
+
+DROP TABLE IF EXISTS "products";
+DROP SEQUENCE IF EXISTS products_id_seq;
+CREATE SEQUENCE products_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."products" (
+    "id" integer DEFAULT nextval('products_id_seq') NOT NULL,
+    "name" character varying(255) NOT NULL,
+    "slug" character varying(255) NOT NULL,
+    "brand" character varying(100) NOT NULL,
+    "model" character varying(100) NOT NULL,
+    "price" numeric(10,0) NOT NULL,
+    "description" text,
+    "specifications" jsonb,
+    "stock_quantity" integer DEFAULT '0' NOT NULL,
+    "thumbnail_id" integer,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "products_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "products_slug_key" UNIQUE ("slug")
+) WITH (oids = false);
+
+CREATE INDEX "idx_products_brand" ON "public"."products" USING btree ("brand");
+
+CREATE INDEX "idx_products_created_at" ON "public"."products" USING btree ("created_at");
+
+CREATE INDEX "idx_products_model" ON "public"."products" USING btree ("model");
+
+CREATE INDEX "idx_products_name" ON "public"."products" USING btree ("name");
+
+CREATE INDEX "idx_products_price" ON "public"."products" USING btree ("price");
+
+CREATE INDEX "idx_products_slug" ON "public"."products" USING btree ("slug");
+
+CREATE INDEX "idx_products_status" ON "public"."products" USING btree ("status");
+
+CREATE INDEX "idx_products_stock_quantity" ON "public"."products" USING btree ("stock_quantity");
+
+CREATE INDEX "idx_products_updated_at" ON "public"."products" USING btree ("updated_at");
+
+INSERT INTO "products" ("id", "name", "slug", "brand", "model", "price", "description", "specifications", "stock_quantity", "thumbnail_id", "created_at", "updated_at", "status") VALUES
+(100,	'ASUS ROG Flow X16',	'asus-gaming-rog-flow-x16',	'ASUS/ROG',	'GV601VV NF044W',	52990000,	'Đánh giá chi tiết laptop gaming ASUS ROG Flow X16 GV601VV... (rest of your description)',	'{"CPU": "Intel® Core™ i9-13900H", "RAM": "16GB DDR5 4800Mhz", "Wifi": "Wi-Fi 6E(802.11ax)", "Màn Hình": "16-inch QHD+", "Ổ Cứng": "1TB PCIe® 4.0 NVMe™ M.2 SSD", "Trọng Lượng": "2.0 kg", "Hệ Điều Hành": "Windows® 11 Home Single Language"}',	10,	148,	'2024-10-21 06:47:59.335367',	'2024-10-21 10:23:41.110961',	1),
+(101,	'LENOVO IDEAPAD SLIM 5',	'lenovo-ideapad-slim-5',	'LENOVO',	'15IRU9 83D0000EVN',	20490000,	'Đánh giá chi tiết Laptop Lenovo Ideapad Slim 5... (rest of your description)',	'{"CPU": "Intel® Core™ 5 120U", "RAM": "16GB DDR5x-5200", "Wifi": "Wi-Fi® 6", "Màn Hình": "15.3inch WUXGA", "Ổ Cứng": "512GB SSD", "Trọng Lượng": "1.79 kg", "Hệ Điều Hành": "Windows® 11 Home Single Language"}',	1000,	113,	'2024-10-21 06:47:59.335367',	'2024-10-21 10:22:56.757216',	1),
+(102,	'Laptop Lenovo ThinkPad X1 2-in-1 Gen 9',	'lenovo-thinkpad-x1-gen9',	'LENOVO',	'21KE004PVN',	59990000,	'Đánh giá chi tiết sản phẩm Laptop Lenovo ThinkPad X1... (rest of your description)',	'{"CPU": "Intel® Core™ Ultra 7 155U", "RAM": "32GB LPDDR5x-6400", "Wifi": "Wi-Fi 6E", "Màn Hình": "14-inch OLED", "Ổ Cứng": "1TB SSD", "Trọng Lượng": "1.8 kg", "Hệ Điều Hành": "Windows® 11 Pro"}',	200,	130,	'2024-10-21 06:47:59.335367',	'2024-10-21 10:23:56.757216',	1);
+
+DELIMITER ;;
+
+CREATE TRIGGER "update_product_modtime" BEFORE UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION update_modified_column();;
+
+DELIMITER ;
+
+DROP TABLE IF EXISTS "reviews";
+DROP SEQUENCE IF EXISTS reviews_id_seq;
+CREATE SEQUENCE reviews_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."reviews" (
+    "id" integer DEFAULT nextval('reviews_id_seq') NOT NULL,
+    "product_id" integer,
+    "user_id" integer,
+    "rating" integer NOT NULL,
+    "comment" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "reviews_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_reviews_created_at" ON "public"."reviews" USING btree ("created_at");
+
+CREATE INDEX "idx_reviews_product_id" ON "public"."reviews" USING btree ("product_id");
+
+CREATE INDEX "idx_reviews_rating" ON "public"."reviews" USING btree ("rating");
+
+CREATE INDEX "idx_reviews_status" ON "public"."reviews" USING btree ("status");
+
+CREATE INDEX "idx_reviews_updated_at" ON "public"."reviews" USING btree ("updated_at");
+
+CREATE INDEX "idx_reviews_user_id" ON "public"."reviews" USING btree ("user_id");
+
+
+DROP TABLE IF EXISTS "role_permissions";
+CREATE TABLE "public"."role_permissions" (
+    "role_id" integer NOT NULL,
+    "permission_id" integer NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "role_permissions_pkey" PRIMARY KEY ("role_id", "permission_id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_role_permissions_created_at" ON "public"."role_permissions" USING btree ("created_at");
+
+CREATE INDEX "idx_role_permissions_permission_id" ON "public"."role_permissions" USING btree ("permission_id");
+
+CREATE INDEX "idx_role_permissions_role_id" ON "public"."role_permissions" USING btree ("role_id");
+
+CREATE INDEX "idx_role_permissions_status" ON "public"."role_permissions" USING btree ("status");
+
+CREATE INDEX "idx_role_permissions_updated_at" ON "public"."role_permissions" USING btree ("updated_at");
+
+
+DROP TABLE IF EXISTS "roles";
+DROP SEQUENCE IF EXISTS roles_id_seq;
+CREATE SEQUENCE roles_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."roles" (
+    "id" integer DEFAULT nextval('roles_id_seq') NOT NULL,
+    "name" character varying(50) NOT NULL,
+    "description" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "roles_name_key" UNIQUE ("name"),
+    CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_roles_created_at" ON "public"."roles" USING btree ("created_at");
+
+CREATE INDEX "idx_roles_name" ON "public"."roles" USING btree ("name");
+
+CREATE INDEX "idx_roles_status" ON "public"."roles" USING btree ("status");
+
+CREATE INDEX "idx_roles_updated_at" ON "public"."roles" USING btree ("updated_at");
+
+INSERT INTO "roles" ("id", "name", "description", "created_at", "updated_at", "status") VALUES
+(1,	'admin',	'Administrator with full access',	'2024-10-22 04:12:24.91556',	'2024-10-22 04:12:24.91556',	1),
+(2,	'manager',	'Manager with elevated privileges',	'2024-10-22 04:12:24.91556',	'2024-10-22 04:12:24.91556',	1),
+(3,	'user',	'Regular user with standard access',	'2024-10-22 04:12:24.91556',	'2024-10-22 04:12:24.91556',	1);
+
+DROP TABLE IF EXISTS "tags";
+DROP SEQUENCE IF EXISTS tags_id_seq;
+CREATE SEQUENCE tags_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."tags" (
+    "id" integer DEFAULT nextval('tags_id_seq') NOT NULL,
+    "name" character varying(50) NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "tags_name_key" UNIQUE ("name"),
+    CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_tags_created_at" ON "public"."tags" USING btree ("created_at");
+
+CREATE INDEX "idx_tags_name" ON "public"."tags" USING btree ("name");
+
+CREATE INDEX "idx_tags_status" ON "public"."tags" USING btree ("status");
+
+CREATE INDEX "idx_tags_updated_at" ON "public"."tags" USING btree ("updated_at");
+
+INSERT INTO "tags" ("id", "name", "created_at", "updated_at", "status") VALUES
+(1,	'ASUS',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1),
+(2,	'DELL',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1),
+(3,	'LENOVO',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1),
+(4,	'ACER',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1),
+(5,	'HP',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1),
+(9,	'ASUS/ROG',	'2024-10-21 06:48:01.388467',	'2024-10-21 06:48:01.388467',	1);
+
+DROP TABLE IF EXISTS "users";
+DROP SEQUENCE IF EXISTS users_id_seq;
+CREATE SEQUENCE users_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."users" (
+    "id" integer DEFAULT nextval('users_id_seq') NOT NULL,
+    "username" character varying(50) NOT NULL,
+    "password" character varying(255) NOT NULL,
+    "email" character varying(100) NOT NULL,
+    "first_name" character varying(50),
+    "last_name" character varying(50),
+    "phone" character varying(20),
+    "address" text,
+    "avatar_id" integer,
+    "role_id" integer DEFAULT '3' NOT NULL,
+    "status" integer DEFAULT '1',
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "users_email_key" UNIQUE ("email"),
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "users_username_key" UNIQUE ("username")
+) WITH (oids = false);
+
+CREATE INDEX "idx_users_created_at" ON "public"."users" USING btree ("created_at");
+
+CREATE INDEX "idx_users_email" ON "public"."users" USING btree ("email");
+
+CREATE INDEX "idx_users_role_id" ON "public"."users" USING btree ("role_id");
+
+CREATE INDEX "idx_users_status" ON "public"."users" USING btree ("status");
+
+CREATE INDEX "idx_users_updated_at" ON "public"."users" USING btree ("updated_at");
+
+CREATE INDEX "idx_users_username" ON "public"."users" USING btree ("username");
+
+INSERT INTO "users" ("id", "username", "password", "email", "first_name", "last_name", "phone", "address", "avatar_id", "role_id", "status", "created_at", "updated_at") VALUES
+(101,	'test1',	'test1@',	'test1@test.com',	'test',	'test',	NULL,	NULL,	NULL,	2,	1,	'2024-10-22 04:36:24.7625',	'2024-10-22 04:36:24.7625');
+
+DROP TABLE IF EXISTS "wishlist";
+DROP SEQUENCE IF EXISTS wishlist_id_seq;
+CREATE SEQUENCE wishlist_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."wishlist" (
+    "id" integer DEFAULT nextval('wishlist_id_seq') NOT NULL,
+    "user_id" integer,
+    "product_id" integer,
+    "added_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "status" integer DEFAULT '1',
+    CONSTRAINT "wishlist_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "wishlist_user_id_product_id_key" UNIQUE ("user_id", "product_id")
+) WITH (oids = false);
+
+CREATE INDEX "idx_wishlist_added_at" ON "public"."wishlist" USING btree ("added_at");
+
+CREATE INDEX "idx_wishlist_product_id" ON "public"."wishlist" USING btree ("product_id");
+
+CREATE INDEX "idx_wishlist_status" ON "public"."wishlist" USING btree ("status");
+
+CREATE INDEX "idx_wishlist_updated_at" ON "public"."wishlist" USING btree ("updated_at");
+
+CREATE INDEX "idx_wishlist_user_id" ON "public"."wishlist" USING btree ("user_id");
+
+
+ALTER TABLE ONLY "public"."categories" ADD CONSTRAINT "categories_image_id_fkey" FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."categories" ADD CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."order_items" ADD CONSTRAINT "order_items_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."order_items" ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "orders_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."product_categories" ADD CONSTRAINT "product_categories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."product_categories" ADD CONSTRAINT "product_categories_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."product_images" ADD CONSTRAINT "product_images_image_id_fkey" FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."product_images" ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."product_specifications" ADD CONSTRAINT "product_specifications_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."product_tags" ADD CONSTRAINT "product_tags_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."product_tags" ADD CONSTRAINT "product_tags_tag_id_fkey" FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."products" ADD CONSTRAINT "products_thumbnail_id_fkey" FOREIGN KEY (thumbnail_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."reviews" ADD CONSTRAINT "reviews_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."role_permissions" ADD CONSTRAINT "role_permissions_permission_id_fkey" FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."role_permissions" ADD CONSTRAINT "role_permissions_role_id_fkey" FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY (avatar_id) REFERENCES images(id) ON DELETE SET NULL NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."wishlist" ADD CONSTRAINT "wishlist_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+-- 2024-10-22 10:19:05.989702+00

@@ -45,6 +45,11 @@ interface ApiResponse {
 }
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+    // Định dạng giá để hiển thị
+    const formattedPrice = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+    }).format(parseFloat(product.price));
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col h-full">
             <Link href={`/app/(client)/san-pham/${product.slug}`} className="flex-grow">
@@ -53,13 +58,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                         src={product.thumbnail_url}
                         alt={product.thumbnail_alt_text || product.product_name}
                         layout="fill"
-                        objectFit="cover"
+                        objectFit='contain'
                     />
                 </div>
                 <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2 text-black truncate">{product.product_name}</h3>
                     <p className="text-gray-600 mb-2">{product.brand} - {product.model}</p>
-                    <p className="text-black font-bold">${parseFloat(product.price).toFixed(2)}</p>
+                    <p className="text-black font-bold">{formattedPrice}</p> {/* Định dạng giá tiền */}
                     {product.categories && (
                         <p className="text-sm text-gray-500 mt-2">{product.categories}</p>
                     )}
@@ -68,11 +73,11 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="flex justify-between p-4 mt-auto">
                 <button className="flex items-center justify-center bg-blue-500 text-white px-4  py-2 rounded-md hover:bg-blue-600 transition-colors duration-300 text-sm">
                     <FaShoppingCart className="mr-1" />
-                    Add to Cart
+                    Thêm vào giỏ
                 </button>
                 <button className="flex items-center justify-center bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300 text-sm">
                     <FaCreditCard className="mr-1" />
-                    Buy Now
+                    Mua Ngay
                 </button>
             </div>
         </div>
@@ -87,7 +92,7 @@ const SectionProductHome: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-2xl font-bold mb-6 text-black">Featured Products</h2>
+            <h2 className="text-2xl font-bold mb-6 text-black">Sản Phẩm Nổi Bật</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {data?.data.map((product) => (
                     <ProductCard key={product.product_id} product={product} />

@@ -44,8 +44,8 @@ export default function Carousel({ images, interval = 2000 }: CarouselProps) {
           <Image
             src={src}
             alt={`Slide ${index + 1}`}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'contain' }}
           />
         </div>
       ))}
