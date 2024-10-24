@@ -12,7 +12,7 @@ const ForgotPasswordPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Implement password reset logic here
+        //xu ly quen mat khau tai day 
         console.log('Password reset requested for:', email);
     };
 

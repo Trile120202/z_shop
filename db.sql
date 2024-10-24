@@ -14,7 +14,6 @@ CREATE TABLE products (
     model VARCHAR(100) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     description TEXT,
-    specifications JSON,
     stock_quantity INT NOT NULL DEFAULT 0,
     thumbnail_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -65,7 +64,28 @@ CREATE TABLE product_categories (
     INDEX idx_product_id (product_id),
     INDEX idx_category_id (category_id)
 );
+CREATE TABLE carts(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    id_order INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
 
+    FOREIGN KEY(id_order) REFERENCES orders(id)ON DELETE CASCADE
+    
+);
+Create table cart_items(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_cart INT NOT NULL,
+    id_product INT NOT NULL,
+    quantity INT NOT NULL,               -- Số lượng sản phẩm
+    price DECIMAL(10, 2) NOT NULL,       -- Giá của sản phẩm
+    total_price DECIMAL(10, 2) NOT NULL,  -- Tổng giá (price * quantity)
+    FOREIGN KEY (id_cart) REFERENCES carts(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_product) REFERENCES products(id) ON DELETE CASCADE
+
+);
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -122,9 +142,11 @@ CREATE TABLE orders (
     user_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
+    coupon_id INT ,
     status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
     shipping_address TEXT,
     payment_method VARCHAR(50),
+    FOREIGN KEY (coupon_id) REFERENCES coupons(id)ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_user_id (user_id),
     INDEX idx_order_date (order_date),
@@ -164,10 +186,10 @@ CREATE TABLE coupons (
     code VARCHAR(50) UNIQUE NOT NULL,
     discount_type ENUM('percentage', 'fixed_amount') NOT NULL,
     discount_value DECIMAL(10, 2) NOT NULL,
-    start_date DATE,
+    start_date DATE, 
     end_date DATE,
-    min_purchase_amount DECIMAL(10, 2),
-    max_usage INT,
+    min_purchase_amount DECIMAL(10, 2), --so tien toi thieu de có the su dung
+    max_usage INT, --so lan su dung toi da
     is_active BOOLEAN DEFAULT TRUE,
     INDEX idx_code (code),
     INDEX idx_discount_type (discount_type),
@@ -206,15 +228,21 @@ CREATE TABLE product_tags (
     INDEX idx_product_id (product_id),
     INDEX idx_tag_id (tag_id)
 );
+CREATE TABLE specifications(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,--ten thong so, vd:(RAM, CPU,MAN HINH,...)
+    unit VARCHAR(150), -- DON vi (GB,GHz, maH)
+    UNIQUE KEY(name)-- Moi truong chi co duy nhat mot gia tri va ten goi di kem
+);
 
 CREATE TABLE product_specifications (
     id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
-    spec_name VARCHAR(100) NOT NULL,
-    spec_value TEXT NOT NULL,
-    unit VARCHAR(50),
+    specifi_id INT NOT NULL, --lien ket den bang thong so (specifications)
+    value TEXT NOT NULL, -- Gia tr cua thong so cua san pham
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    UNIQUE KEY (product_id, spec_name),
+    FOREIGN KEY (specifi_id) REFERENCES specifications(id) ON DELETE CASCADE,
+    UNIQUE KEY (product_id, specifi_id),   -- Mỗi sản phẩm chỉ có một giá trị cho mỗi loại thông số
     INDEX idx_product_id (product_id),
-    INDEX idx_spec_name (spec_name)
+    INDEX idx_specification_id (specifi_id)
 );
