@@ -166,7 +166,7 @@ CREATE TABLE orders (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_user_id (user_id),
     INDEX idx_order_date (order_date),
-    INDEX idx_status (status),
+    
     INDEX idx_total_amount (total_amount)
 );
 
