@@ -7,6 +7,7 @@ CREATE TABLE images (
     INDEX idx_created_at (created_at)
 );
 
+    
 CREATE TABLE products (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -136,14 +137,29 @@ CREATE TABLE role_permissions (
     INDEX idx_role_id (role_id),
     INDEX idx_permission_id (permission_id)
 );
+CREATE TABLE order_status (
+    status_id INT AUTO_INCREMENT PRIMARY KEY,
+    status_name VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE TABLE order_status_details (
+    detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    status_id INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    remarks VARCHAR(255),
+    
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (status_id) REFERENCES order_status(status_id) ON DELETE CASCADE
+);
 CREATE TABLE orders (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
     coupon_id INT ,
-    status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
     shipping_address TEXT,
     payment_method VARCHAR(50),
     FOREIGN KEY (coupon_id) REFERENCES coupons(id)ON DELETE SET NULL,
@@ -228,21 +244,65 @@ CREATE TABLE product_tags (
     INDEX idx_product_id (product_id),
     INDEX idx_tag_id (tag_id)
 );
-CREATE TABLE specifications(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,--ten thong so, vd:(RAM, CPU,MAN HINH,...)
-    unit VARCHAR(150), -- DON vi (GB,GHz, maH)
-    UNIQUE KEY(name)-- Moi truong chi co duy nhat mot gia tri va ten goi di kem
-);
-
-CREATE TABLE product_specifications (
+CREATE TABLE ram_specifications(
     id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
-    specifi_id INT NOT NULL, --lien ket den bang thong so (specifications)
-    value TEXT NOT NULL, -- Gia tr cua thong so cua san pham
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (specifi_id) REFERENCES specifications(id) ON DELETE CASCADE,
-    UNIQUE KEY (product_id, specifi_id),   -- Mỗi sản phẩm chỉ có một giá trị cho mỗi loại thông số
-    INDEX idx_product_id (product_id),
-    INDEX idx_specification_id (specifi_id)
+    name VARCHAR(255) NOT NULL,
+    capacity VARCHAR(50),
+    type VARCHAR(50),
+    speed VARCHAR(50),
+    FOREIGN KEY (id) REFERENCES products(id) ON DELETE CASCADE
 );
+CREATE TABLE screen_specifications(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    size VARCHAR(255),
+    resolution VARCHAR(50),
+    panel_type VARCHAR(50),
+    refresh_rate VARCHAR(50),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE 
+);
+CREATE TABLE cpu_specifications (
+    cpu_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    model VARCHAR(50),              -- tên model CPU
+    cores INT,                      -- số lượng nhân
+    threads INT,                    -- số lượng luồng
+    base_clock VARCHAR(50),         -- tốc độ xung nhịp cơ bản (GHz)
+    boost_clock VARCHAR(50),        -- tốc độ xung nhịp tối đa (GHz)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+CREATE TABLE battery_specifications (
+    battery_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    capacity VARCHAR(50),           -- dung lượng pin (Wh hoặc mAh)
+    type VARCHAR(50),               -- loại pin (Li-Ion, Li-Polymer,...)
+    battery_life VARCHAR(50),       -- thời lượng pin (ví dụ: 10 giờ)
+    charging_time VARCHAR(50),      -- thời gian sạc (ví dụ: 2 giờ)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+CREATE TABLE vga_specifications (
+    vga_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    model VARCHAR(50),              -- tên model VGA
+    vram VARCHAR(50),               -- dung lượng VRAM (ví dụ: 4GB)
+    type VARCHAR(50),               -- loại bộ nhớ (GDDR5, GDDR6,...)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+CREATE TABLE storage_specifications (
+    storage_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    type VARCHAR(50),               -- loại ổ cứng (SSD, HDD)
+    capacity VARCHAR(50),           -- dung lượng (ví dụ: 512GB)
+    interface VARCHAR(50),          -- giao diện (SATA, NVMe,...)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+CREATE TABLE connectivity_ports (
+    port_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    port_type VARCHAR(50),          -- loại cổng (USB, HDMI, Thunderbolt,...)
+    quantity INT,                   -- số lượng cổng
+    version VARCHAR(50),            -- phiên bản (ví dụ: USB 3.0, HDMI 2.1)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
